@@ -1,10 +1,21 @@
-# 📅 Dollarama Shift Scheduler
+# 📅 Shift Scheduler
 
-An automated employee shift scheduling system with a **fully interactive web interface** — runs entirely in your browser!
+[![Live Demo](https://img.shields.io/badge/🚀_Try_It_Now-Live_Demo-003F24?style=for-the-badge)](https://uzair-aftab.github.io/dollarama-scheduler/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-FEE60E?style=for-the-badge&logo=github&logoColor=black)](https://github.com/uzair-aftab/dollarama-scheduler)
 
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow)
-![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Live-green)
+> **Inspired by Dollarama** — An automated employee shift scheduling system with a **fully interactive web interface** that runs entirely in your browser!
+
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?logo=javascript&logoColor=black)
+![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Live-003F24)
 ![License](https://img.shields.io/badge/License-MIT-blue)
+
+---
+
+## ⚠️ Disclaimer
+
+This tool was created by **Uzair Aftab** as a personal portfolio project, inspired by his 3-month experience working at Dollarama. **It is not affiliated with, endorsed by, or connected to Dollarama in any way.** This project is for educational and demonstration purposes only.
+
+---
 
 ## ✨ Features
 
@@ -13,26 +24,15 @@ An automated employee shift scheduling system with a **fully interactive web int
 - **Role-Based Assignments**: Supports ATL (managers), FullTime, and PartTime roles
 - **Availability Grid**: Visual 7×24 hour picker for employee availability
 - **Target Hour Optimization**: Schedules employees close to their preferred hours
-- **Dark Mode**: Toggle between light and dark themes
+- **Dark Mode**: Toggle between light and dark themes (Dollarama green color scheme!)
 - **Import/Export**: Backup and restore your data as JSON
 - **Mobile Friendly**: Responsive design works on any device
 
 ## 🚀 Try It Now
 
-**[Open the Live Scheduler →](https://uzair-aftab.github.io/dollarama-scheduler/)**
+**[👉 Open the Live Scheduler](https://uzair-aftab.github.io/dollarama-scheduler/)**
 
 No installation required — works in any modern browser!
-
-## 📸 Screenshots
-
-### Schedule View
-Generate optimal schedules with one click.
-
-### Employee Management
-Add employees with visual availability picker.
-
-### Shift Configuration
-Configure shift templates for your store.
 
 ## 💻 Local Development
 
@@ -55,7 +55,7 @@ jupyter lab
 dollarama-scheduler/
 ├── docs/                    # GitHub Pages site
 │   ├── index.html           # Main application
-│   ├── style.css            # Styles with dark mode
+│   ├── style.css            # Styles with Dollarama colors
 │   ├── app.js               # UI logic & event handlers
 │   ├── scheduler.js         # Constraint-based scheduler
 │   └── storage.js           # LocalStorage persistence
@@ -92,6 +92,12 @@ All data is stored in your browser's localStorage:
 
 Use **Export** to backup your data as JSON, and **Import** to restore.
 
+## 🎨 Dollarama-Inspired Design
+
+The app features Dollarama's signature color scheme:
+- **Kaitoke Green** (`#003F24`) — Primary color
+- **Lemon Yellow** (`#FEE60E`) — Accent color
+
 ## 🛠️ Customization
 
 ### Adding Employees
@@ -122,3 +128,5 @@ MIT License — feel free to use and modify!
 ---
 
 Made with ☕ by [Uzair Aftab](https://github.com/uzair-aftab)
+
+*This is a personal project for portfolio/educational purposes. Not affiliated with Dollarama.*
