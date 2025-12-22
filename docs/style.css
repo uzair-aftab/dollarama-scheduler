@@ -5,24 +5,30 @@
 
 /* CSS Variables for theming */
 :root {
+    /* Dollarama Brand Colors */
+    --dollarama-green: #003F24;
+    --dollarama-green-light: #005a35;
+    --dollarama-yellow: #FEE60E;
+    --dollarama-yellow-dark: #d4c000;
+
     /* Colors - Light Mode */
-    --bg-primary: #f8fafc;
+    --bg-primary: #f0f4f2;
     --bg-secondary: #ffffff;
-    --bg-tertiary: #f1f5f9;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --text-muted: #94a3b8;
-    --border-color: #e2e8f0;
-    --accent-primary: #0ea5e9;
-    --accent-secondary: #8b5cf6;
+    --bg-tertiary: #e8f0ec;
+    --text-primary: #1a2e23;
+    --text-secondary: #4a6555;
+    --text-muted: #7a9487;
+    --border-color: #c8d9cf;
+    --accent-primary: var(--dollarama-green);
+    --accent-secondary: var(--dollarama-yellow);
     --success: #10b981;
-    --warning: #f59e0b;
+    --warning: var(--dollarama-yellow);
     --danger: #ef4444;
 
-    /* Role Colors */
-    --role-atl: #8b5cf6;
-    --role-fulltime: #0ea5e9;
-    --role-parttime: #10b981;
+    /* Role Colors - Dollarama themed */
+    --role-atl: #6b21a8;
+    --role-fulltime: var(--dollarama-green);
+    --role-parttime: #0891b2;
 
     /* Shadows */
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -44,13 +50,13 @@
 
 /* Dark Mode */
 [data-theme="dark"] {
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-tertiary: #334155;
-    --text-primary: #f1f5f9;
-    --text-secondary: #cbd5e1;
-    --text-muted: #64748b;
-    --border-color: #334155;
+    --bg-primary: #0a1f14;
+    --bg-secondary: #122a1e;
+    --bg-tertiary: #1a3d2a;
+    --text-primary: #e8f5ee;
+    --text-secondary: #a7c9b8;
+    --text-muted: #6b9980;
+    --border-color: #2a4d38;
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
@@ -204,8 +210,8 @@ body {
 }
 
 .btn-primary:hover {
-    background: #0284c7;
-    border-color: #0284c7;
+    background: var(--dollarama-green-light);
+    border-color: var(--dollarama-green-light);
 }
 
 .btn-danger {
@@ -985,4 +991,73 @@ body {
 
 .loading {
     animation: pulse 2s infinite;
+}
+
+/* =============================================================================
+   DOLLARAMA BRANDING
+   ============================================================================= */
+.logo-img {
+    height: 40px;
+    width: auto;
+}
+
+.logo h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dollarama-green);
+}
+
+[data-theme="dark"] .logo h1 {
+    color: var(--dollarama-yellow);
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* Disclaimer Banner */
+.disclaimer-banner {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: var(--space-md);
+    margin-bottom: var(--space-lg);
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.disclaimer-banner strong {
+    color: var(--text-primary);
+}
+
+/* Footer Disclaimer */
+.footer-disclaimer {
+    max-width: 600px;
+    margin: var(--space-md) auto 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.5;
+}
+
+/* Accent highlights */
+.highlight-yellow {
+    color: var(--dollarama-yellow);
+}
+
+.highlight-green {
+    color: var(--dollarama-green);
+}
+
+[data-theme="dark"] .highlight-green {
+    color: #4ade80;
 }
