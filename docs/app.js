@@ -1,5 +1,5 @@
 /**
- * Dollarama Shift Scheduler - Main Application v4.2
+ * Dollarama Shift Scheduler - Main Application v5.0
  * Full interactive scheduling with role management and constraints
  */
 
@@ -416,15 +416,33 @@ function initSettingsForm() {
 
 function loadSettings() {
     const settings = Storage.getSettings();
+    document.getElementById('setting-store-hours').value = settings.storeWeeklyHours || 280;
     document.getElementById('setting-min-rest').value = settings.minRestHours || 10;
     document.getElementById('setting-max-consecutive').value = settings.maxConsecutiveDays || 5;
+    document.getElementById('setting-min-shift').value = settings.minShiftHours || 4;
+    document.getElementById('setting-break-after').value = settings.breakAfterHours || 4;
+    document.getElementById('setting-break-duration').value = settings.breakDurationMinutes || 30;
+    document.getElementById('setting-intl-max').value = settings.internationalStudentMaxHours || 24;
 }
 
 function saveSettings() {
+    const storeWeeklyHours = parseInt(document.getElementById('setting-store-hours').value);
     const minRestHours = parseInt(document.getElementById('setting-min-rest').value);
     const maxConsecutiveDays = parseInt(document.getElementById('setting-max-consecutive').value);
+    const minShiftHours = parseInt(document.getElementById('setting-min-shift').value);
+    const breakAfterHours = parseInt(document.getElementById('setting-break-after').value);
+    const breakDurationMinutes = parseInt(document.getElementById('setting-break-duration').value);
+    const internationalStudentMaxHours = parseInt(document.getElementById('setting-intl-max').value);
 
-    Storage.updateSettings({ minRestHours, maxConsecutiveDays });
+    Storage.updateSettings({
+        storeWeeklyHours,
+        minRestHours,
+        maxConsecutiveDays,
+        minShiftHours,
+        breakAfterHours,
+        breakDurationMinutes,
+        internationalStudentMaxHours
+    });
     showToast('Settings saved', 'success');
 }
 
@@ -438,6 +456,9 @@ function initEmployeeForm() {
 
     // Save button
     document.getElementById('save-employee-btn').addEventListener('click', saveEmployee);
+
+    // Employment status change - update max hours hint
+    document.getElementById('emp-status').addEventListener('change', updateMaxHoursHint);
 }
 
 function buildAvailabilityGrid() {
@@ -507,8 +528,12 @@ function openEmployeeModal(employee = null) {
     document.getElementById('emp-id').value = employee?.id || '';
     document.getElementById('emp-name').value = employee?.name || '';
     document.getElementById('emp-role').value = employee?.role || 'PartTime';
+    document.getElementById('emp-status').value = employee?.employmentStatus || 'Citizen';
     document.getElementById('emp-target').value = employee?.targetHours || 20;
     document.getElementById('emp-max').value = employee?.maxHours || 24;
+
+    // Update max hours hint for international students
+    updateMaxHoursHint();
 
     // Reset availability grid
     availabilityState = {};
@@ -532,11 +557,35 @@ function openEmployeeModal(employee = null) {
     openModal('employee-modal');
 }
 
+// Update hint text when employment status changes
+function updateMaxHoursHint() {
+    const status = document.getElementById('emp-status').value;
+    const hint = document.getElementById('emp-max-hint');
+    if (status === 'InternationalStudent') {
+        const settings = Storage.getSettings();
+        hint.textContent = `Maximum ${settings.internationalStudentMaxHours || 24}hrs for international students`;
+        hint.style.color = 'var(--warning)';
+    } else {
+        hint.textContent = '';
+    }
+}
+
 function saveEmployee() {
     const name = document.getElementById('emp-name').value.trim();
     const role = document.getElementById('emp-role').value;
+    const employmentStatus = document.getElementById('emp-status').value;
     const targetHours = parseInt(document.getElementById('emp-target').value);
-    const maxHours = parseInt(document.getElementById('emp-max').value);
+    let maxHours = parseInt(document.getElementById('emp-max').value);
+
+    // Enforce 24hr cap for international students
+    if (employmentStatus === 'InternationalStudent') {
+        const settings = Storage.getSettings();
+        const intlMax = settings.internationalStudentMaxHours || 24;
+        if (maxHours > intlMax) {
+            maxHours = intlMax;
+            showToast(`Max hours capped to ${intlMax} for international students`, 'warning');
+        }
+    }
 
     if (!name) {
         showToast('Please enter a name', 'error');
@@ -554,7 +603,7 @@ function saveEmployee() {
         }
     }
 
-    const employee = { name, role, targetHours, maxHours, availability };
+    const employee = { name, role, employmentStatus, targetHours, maxHours, availability };
 
     if (editingEmployeeId) {
         Storage.updateEmployee(editingEmployeeId, employee);
