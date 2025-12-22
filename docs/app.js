@@ -1,5 +1,5 @@
 /**
- * Dollarama Shift Scheduler - Main Application v4.0
+ * Dollarama Shift Scheduler - Main Application v4.1
  * Full interactive scheduling with role management and constraints
  */
 
@@ -29,6 +29,9 @@ let confirmCallback = null;
 // =============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize intro splash screen
+    initIntroScreen();
+
     initTheme();
     initTabs();
     initDropdown();
@@ -60,6 +63,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // Populate dynamic role options
     updateRoleDropdowns();
 });
+
+// =============================================================================
+// INTRO SPLASH SCREEN
+// =============================================================================
+
+function initIntroScreen() {
+    const intro = document.getElementById('intro-overlay');
+    if (!intro) return;
+
+    // Skip intro if user has visited before in this session
+    if (sessionStorage.getItem('intro_seen')) {
+        intro.classList.add('hidden');
+        return;
+    }
+
+    // Dismiss on click
+    intro.addEventListener('click', () => {
+        intro.classList.add('hiding');
+        sessionStorage.setItem('intro_seen', 'true');
+
+        // Remove from DOM after animation
+        setTimeout(() => {
+            intro.classList.add('hidden');
+        }, 800);
+    });
+}
 
 // =============================================================================
 // THEME

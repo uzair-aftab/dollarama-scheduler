@@ -1,5 +1,5 @@
 /**
- * JavaScript Scheduling Engine for Dollarama Shift Scheduler v4.0
+ * JavaScript Scheduling Engine for Dollarama Shift Scheduler v4.1
  * Implements constraint-based scheduling with optimization
  * Features: Min rest hours, max consecutive days, role matching
  */
