@@ -1,7 +1,7 @@
 /**
- * JavaScript Scheduling Engine for Dollarama Shift Scheduler v4.2
+ * JavaScript Scheduling Engine for Dollarama Shift Scheduler v5.0
  * Implements constraint-based scheduling with optimization
- * Features: Min rest hours, max consecutive days, role matching
+ * Features: Min rest hours, max consecutive days, role matching, international student limits, breaks
  */
 
 const Scheduler = {
@@ -11,7 +11,7 @@ const Scheduler = {
      * Main scheduling function
      * @param {Array} employees - List of employees
      * @param {Array} shiftTemplates - List of shift templates
-     * @param {Object} settings - Scheduling settings (minRestHours, maxConsecutiveDays)
+     * @param {Object} settings - Scheduling settings
      * @returns {Object} Schedule result with assignments and stats
      */
     generateSchedule(employees, shiftTemplates, settings = {}) {
@@ -20,15 +20,25 @@ const Scheduler = {
         // Get settings with defaults
         const minRestHours = settings.minRestHours ?? 10;
         const maxConsecutiveDays = settings.maxConsecutiveDays ?? 5;
+        const storeWeeklyHours = settings.storeWeeklyHours ?? 280;
+        const minShiftHours = settings.minShiftHours ?? 4;
+        const breakAfterHours = settings.breakAfterHours ?? 4;
+        const breakDurationMinutes = settings.breakDurationMinutes ?? 30;
+        const internationalStudentMaxHours = settings.internationalStudentMaxHours ?? 24;
 
-        // Generate all shifts for the week
-        const shifts = this.generateWeeklyShifts(shiftTemplates);
+        // Generate all shifts for the week (filter by min shift length)
+        const allShifts = this.generateWeeklyShifts(shiftTemplates);
+        const shifts = allShifts.filter(s => s.hours >= minShiftHours);
+
+        if (shifts.length < allShifts.length) {
+            console.warn(`Filtered out ${allShifts.length - shifts.length} shifts under ${minShiftHours} hour minimum`);
+        }
 
         // Build feasibility matrix
         const { feasible, shiftCandidates, employeeShifts } = this.buildFeasibilityMatrix(employees, shifts);
 
         // Check for unfillable shifts
-        const unfillable = shifts.filter((_, idx) => shiftCandidates[idx].length === 0);
+        const unfillable = shifts.filter((_, idx) => shiftCandidates[shifts[idx].id]?.length === 0);
         if (unfillable.length > 0) {
             return {
                 success: false,
@@ -38,10 +48,10 @@ const Scheduler = {
             };
         }
 
-        // Run the scheduling algorithm with constraints
+        // Run the scheduling algorithm with all constraints
         const assignments = this.solve(
             employees, shifts, feasible, shiftCandidates, employeeShifts,
-            { minRestHours, maxConsecutiveDays }
+            { minRestHours, maxConsecutiveDays, storeWeeklyHours, internationalStudentMaxHours }
         );
 
         if (!assignments) {
@@ -52,9 +62,13 @@ const Scheduler = {
             };
         }
 
-        // Build the result
-        const schedule = this.buildScheduleResult(employees, shifts, assignments);
+        // Build the result with break calculations
+        const schedule = this.buildScheduleResult(employees, shifts, assignments, { breakAfterHours, breakDurationMinutes });
         const elapsed = performance.now() - startTime;
+
+        // Calculate total scheduled hours
+        const totalHours = schedule.reduce((sum, s) => sum + s.hours, 0);
+        const totalPaidHours = schedule.reduce((sum, s) => sum + s.paidHours, 0);
 
         return {
             success: true,
@@ -62,11 +76,17 @@ const Scheduler = {
             solveTime: Math.round(elapsed),
             constraints: {
                 minRestHours,
-                maxConsecutiveDays
+                maxConsecutiveDays,
+                storeWeeklyHours,
+                minShiftHours,
+                breakAfterHours,
+                breakDurationMinutes,
+                internationalStudentMaxHours
             },
             stats: {
                 totalShifts: schedule.length,
-                totalHours: schedule.reduce((sum, s) => sum + s.hours, 0),
+                totalHours: totalHours,
+                totalPaidHours: totalPaidHours,
                 employeesScheduled: new Set(schedule.map(s => s.employee)).size
             },
             schedule: schedule,
@@ -198,15 +218,21 @@ const Scheduler = {
             // 1. Max one shift per day
             if (employeeDays[empId].has(shift.dayIndex)) continue;
 
-            // 2. Max weekly hours
+            // 2. Max weekly hours (respects individual's maxHours)
             if (employeeHours[empId] + shift.hours > emp.maxHours) continue;
 
-            // 3. Min rest hours (check previous day's shift)
+            // 3. International student 24hr cap
+            if (emp.employmentStatus === 'InternationalStudent') {
+                const studentMaxHours = constraints.internationalStudentMaxHours || 24;
+                if (employeeHours[empId] + shift.hours > studentMaxHours) continue;
+            }
+
+            // 4. Min rest hours (check previous day's shift)
             if (!this.checkMinRestHours(empId, shift, employeeShiftsByDay, shiftMap, constraints.minRestHours)) {
                 continue;
             }
 
-            // 4. Max consecutive days
+            // 5. Max consecutive days
             if (!this.checkMaxConsecutiveDays(empId, shift.dayIndex, employeeDays, constraints.maxConsecutiveDays)) {
                 continue;
             }
@@ -291,19 +317,29 @@ const Scheduler = {
     },
 
     /**
-     * Build the final schedule result
+     * Build the final schedule result with break calculations
      */
-    buildScheduleResult(employees, shifts, assignments) {
+    buildScheduleResult(employees, shifts, assignments, breakConfig = {}) {
         const empMap = Object.fromEntries(employees.map(e => [e.id, e]));
         const schedule = [];
+
+        const breakAfterHours = breakConfig.breakAfterHours ?? 4;
+        const breakDurationMinutes = breakConfig.breakDurationMinutes ?? 30;
 
         for (const shift of shifts) {
             const empId = assignments[shift.id];
             if (empId !== undefined) {
                 const emp = empMap[empId];
+
+                // Calculate break time
+                const hasBreak = shift.hours >= breakAfterHours;
+                const breakMinutes = hasBreak ? breakDurationMinutes : 0;
+                const paidHours = shift.hours - (breakMinutes / 60);
+
                 schedule.push({
                     employee: emp.name,
                     employeeId: emp.id,
+                    employmentStatus: emp.employmentStatus || 'Citizen',
                     role: emp.role,
                     day: shift.day,
                     dayIndex: shift.dayIndex,
@@ -311,7 +347,10 @@ const Scheduler = {
                     start: shift.start,
                     end: shift.end,
                     shift: `${String(shift.start).padStart(2, '0')}:00-${String(shift.end).padStart(2, '0')}:00`,
-                    hours: shift.hours
+                    hours: shift.hours,
+                    hasBreak: hasBreak,
+                    breakMinutes: breakMinutes,
+                    paidHours: paidHours
                 });
             }
         }
@@ -324,10 +363,12 @@ const Scheduler = {
      */
     buildEmployeeSummary(employees, schedule) {
         const hoursByEmp = {};
+        const paidHoursByEmp = {};
         const daysByEmp = {};
 
         for (const s of schedule) {
             hoursByEmp[s.employeeId] = (hoursByEmp[s.employeeId] || 0) + s.hours;
+            paidHoursByEmp[s.employeeId] = (paidHoursByEmp[s.employeeId] || 0) + s.paidHours;
             if (!daysByEmp[s.employeeId]) daysByEmp[s.employeeId] = new Set();
             daysByEmp[s.employeeId].add(s.day);
         }
@@ -336,7 +377,9 @@ const Scheduler = {
             id: emp.id,
             name: emp.name,
             role: emp.role,
+            employmentStatus: emp.employmentStatus || 'Citizen',
             scheduledHours: hoursByEmp[emp.id] || 0,
+            scheduledPaidHours: paidHoursByEmp[emp.id] || 0,
             scheduledDays: daysByEmp[emp.id] ? daysByEmp[emp.id].size : 0,
             targetHours: emp.targetHours,
             maxHours: emp.maxHours

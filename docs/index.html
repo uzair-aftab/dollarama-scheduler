@@ -224,6 +224,15 @@
                     <div class="card-body">
                         <div class="settings-section">
                             <h3 class="settings-title">📊 Scheduling Constraints</h3>
+
+                            <div class="settings-row">
+                                <span class="settings-label">Store weekly hours budget</span>
+                                <div class="settings-value">
+                                    <input type="number" id="setting-store-hours" min="0" max="1000" value="280">
+                                    <span>hours</span>
+                                </div>
+                            </div>
+
                             <div class="settings-row">
                                 <span class="settings-label">Minimum rest hours between shifts</span>
                                 <div class="settings-value">
@@ -231,6 +240,7 @@
                                     <span>hours</span>
                                 </div>
                             </div>
+
                             <div class="settings-row">
                                 <span class="settings-label">Maximum consecutive working days</span>
                                 <div class="settings-value">
@@ -238,9 +248,52 @@
                                     <span>days</span>
                                 </div>
                             </div>
-                            <button class="btn btn-primary" id="save-settings-btn" style="margin-top: 1rem;">💾 Save
-                                Settings</button>
+
+                            <div class="settings-row">
+                                <span class="settings-label">Minimum shift length</span>
+                                <div class="settings-value">
+                                    <input type="number" id="setting-min-shift" min="1" max="12" value="4">
+                                    <span>hours</span>
+                                </div>
+                            </div>
                         </div>
+
+                        <div class="settings-section">
+                            <h3 class="settings-title">☕ Break Settings (Ontario Law)</h3>
+
+                            <div class="settings-row">
+                                <span class="settings-label">Unpaid break required after</span>
+                                <div class="settings-value">
+                                    <input type="number" id="setting-break-after" min="1" max="8" value="4">
+                                    <span>hours</span>
+                                </div>
+                            </div>
+
+                            <div class="settings-row">
+                                <span class="settings-label">Break duration</span>
+                                <div class="settings-value">
+                                    <input type="number" id="setting-break-duration" min="15" max="60" value="30">
+                                    <span>minutes</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3 class="settings-title">🎓 International Student Compliance</h3>
+
+                            <div class="settings-row">
+                                <span class="settings-label">International student max hours</span>
+                                <div class="settings-value">
+                                    <input type="number" id="setting-intl-max" min="1" max="40" value="24">
+                                    <span>hours/week</span>
+                                </div>
+                            </div>
+                            <p class="hint">International students in Canada cannot work more than 24 hours per week
+                                during regular school terms.</p>
+                        </div>
+
+                        <button class="btn btn-primary" id="save-settings-btn" style="margin-top: 1rem;">💾 Save
+                            Settings</button>
                     </div>
                 </div>
 
@@ -259,7 +312,7 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>Shift Scheduler v4.2 • Built with JavaScript</p>
+            <p>Shift Scheduler v5.0 • Built with JavaScript</p>
             <p class="footer-link">
                 <a href="https://github.com/uzair-aftab/dollarama-scheduler" target="_blank">View on GitHub</a>
             </p>
@@ -291,11 +344,20 @@
                         <div class="form-group">
                             <label for="emp-role">Role</label>
                             <select id="emp-role" required>
-                                <option value="ATL">ATL (Manager)</option>
-                                <option value="FullTime">Full Time</option>
-                                <option value="PartTime">Part Time</option>
+                                <!-- Populated dynamically -->
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label for="emp-status">Employment Status</label>
+                            <select id="emp-status" required>
+                                <option value="Citizen">Citizen</option>
+                                <option value="PR">Permanent Resident</option>
+                                <option value="InternationalStudent">International Student (24hr max)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="emp-target">Target Hours</label>
                             <input type="number" id="emp-target" min="0" max="60" value="20" required>
@@ -303,6 +365,7 @@
                         <div class="form-group">
                             <label for="emp-max">Max Hours</label>
                             <input type="number" id="emp-max" min="0" max="60" value="24" required>
+                            <small class="hint" id="emp-max-hint"></small>
                         </div>
                     </div>
 

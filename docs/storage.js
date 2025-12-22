@@ -1,5 +1,5 @@
 /**
- * Storage Layer for Dollarama Shift Scheduler v4.2
+ * Storage Layer for Dollarama Shift Scheduler v5.0
  * Handles localStorage persistence, roles, scheduling constraints, and data operations
  */
 
@@ -14,16 +14,23 @@ const Storage = {
 
     // Default roles
     DEFAULT_ROLES: [
-        { id: 1, name: 'ATL', label: 'Manager', color: '#7c3aed', canManage: true },
-        { id: 2, name: 'FullTime', label: 'Full Time', color: '#003F24', canManage: false },
-        { id: 3, name: 'PartTime', label: 'Part Time', color: '#0891b2', canManage: false }
+        { id: 1, name: 'StoreManager', label: 'Store Manager', color: '#dc2626', canManage: true, priority: 1 },
+        { id: 2, name: 'ATL', label: 'Assistant Team Leader', color: '#7c3aed', canManage: true, priority: 2 },
+        { id: 3, name: 'TL', label: 'Team Leader', color: '#f59e0b', canManage: true, priority: 3 },
+        { id: 4, name: 'FullTime', label: 'Full Time', color: '#003F24', canManage: false, priority: 4 },
+        { id: 5, name: 'PartTime', label: 'Part Time', color: '#0891b2', canManage: false, priority: 5 }
     ],
 
     // Default scheduling settings
     DEFAULT_SETTINGS: {
-        minRestHours: 10,       // Minimum hours between shifts
-        maxConsecutiveDays: 5,  // Max days in a row an employee can work
-        weekStartsOn: 'Monday'
+        minRestHours: 10,           // Minimum hours between shifts
+        maxConsecutiveDays: 5,      // Max days in a row an employee can work
+        weekStartsOn: 'Monday',
+        storeWeeklyHours: 280,      // Total store hours budget per week
+        minShiftHours: 4,           // Minimum shift length in hours
+        breakAfterHours: 4,         // Hours worked before break required
+        breakDurationMinutes: 30,   // Unpaid break duration in minutes
+        internationalStudentMaxHours: 24  // Weekly cap for international students
     },
 
     // Default shift template
@@ -42,6 +49,7 @@ const Storage = {
             id: 1,
             name: 'Sarah Chen',
             role: 'ATL',
+            employmentStatus: 'Citizen',
             maxHours: 44,
             targetHours: 40,
             availability: {
@@ -53,6 +61,7 @@ const Storage = {
             id: 2,
             name: 'Marcus Johnson',
             role: 'ATL',
+            employmentStatus: 'Citizen',
             maxHours: 44,
             targetHours: 40,
             availability: {
@@ -63,7 +72,8 @@ const Storage = {
         {
             id: 3,
             name: 'Rachel Green',
-            role: 'ATL',
+            role: 'TL',
+            employmentStatus: 'PR',
             maxHours: 40,
             targetHours: 35,
             availability: {
@@ -75,6 +85,7 @@ const Storage = {
             id: 4,
             name: 'Emily Rodriguez',
             role: 'FullTime',
+            employmentStatus: 'PR',
             maxHours: 40,
             targetHours: 38,
             availability: {
@@ -86,6 +97,7 @@ const Storage = {
             id: 5,
             name: 'David Kim',
             role: 'FullTime',
+            employmentStatus: 'Citizen',
             maxHours: 40,
             targetHours: 38,
             availability: {
@@ -97,6 +109,7 @@ const Storage = {
             id: 6,
             name: 'Lisa Park',
             role: 'FullTime',
+            employmentStatus: 'Citizen',
             maxHours: 40,
             targetHours: 36,
             availability: {
@@ -108,6 +121,7 @@ const Storage = {
             id: 7,
             name: 'Michael Torres',
             role: 'FullTime',
+            employmentStatus: 'Citizen',
             maxHours: 40,
             targetHours: 38,
             availability: {
@@ -119,6 +133,7 @@ const Storage = {
             id: 8,
             name: 'Uzair Aftab',
             role: 'PartTime',
+            employmentStatus: 'InternationalStudent',
             maxHours: 24,
             targetHours: 20,
             availability: {
@@ -130,6 +145,7 @@ const Storage = {
             id: 9,
             name: 'Aisha Patel',
             role: 'PartTime',
+            employmentStatus: 'Citizen',
             maxHours: 24,
             targetHours: 22,
             availability: {
@@ -141,6 +157,7 @@ const Storage = {
             id: 10,
             name: 'James Wilson',
             role: 'PartTime',
+            employmentStatus: 'Citizen',
             maxHours: 20,
             targetHours: 16,
             availability: {
@@ -152,7 +169,8 @@ const Storage = {
             id: 11,
             name: 'Priya Sharma',
             role: 'PartTime',
-            maxHours: 20,
+            employmentStatus: 'InternationalStudent',
+            maxHours: 24,
             targetHours: 18,
             availability: {
                 Monday: null, Tuesday: null, Wednesday: null,
@@ -163,6 +181,7 @@ const Storage = {
             id: 12,
             name: 'Kevin Martinez',
             role: 'PartTime',
+            employmentStatus: 'Citizen',
             maxHours: 24,
             targetHours: 20,
             availability: {
