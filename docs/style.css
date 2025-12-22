@@ -1,5 +1,5 @@
 /* =============================================================================
-   DOLLARAMA SHIFT SCHEDULER - MODERN UI v5.0
+   DOLLARAMA SHIFT SCHEDULER - MODERN UI v5.1
    Apple/Google-inspired design with glassmorphism and smooth animations
    ============================================================================= */
 
@@ -109,7 +109,7 @@ html {
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', sans-serif;
+    font-family: 'Inter', 'DM Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.6;
@@ -117,6 +117,9 @@ body {
     transition: background var(--transition-slow), color var(--transition-normal);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    letter-spacing: -0.011em;
 }
 
 /* Background Pattern */
@@ -628,6 +631,50 @@ body::before {
     margin-bottom: var(--space-md);
 }
 
+.hint-warning {
+    font-size: 0.8rem;
+    color: #ea580c;
+    font-weight: 600;
+    display: block;
+    margin-top: var(--space-xs);
+}
+
+[data-theme="dark"] .hint-warning {
+    color: #fb923c;
+}
+
+/* Checkbox Label Styling */
+.form-group-checkbox {
+    width: 100%;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    transition: background var(--transition-fast);
+}
+
+.checkbox-label:hover {
+    background: var(--bg-primary);
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--dollarama-green);
+    cursor: pointer;
+}
+
+.checkbox-text {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
 /* =============================================================================
    SCHEDULE GRID - Modern Table Style
    ============================================================================= */
@@ -637,11 +684,11 @@ body::before {
     background: var(--border-color);
     border-radius: var(--radius-lg);
     overflow: hidden;
-    min-width: 700px;
+    min-width: 800px;
 }
 
 .schedule-grid.loaded {
-    grid-template-columns: 180px repeat(7, 1fr);
+    grid-template-columns: 150px repeat(7, 1fr) 100px;
 }
 
 .grid-header {
@@ -706,6 +753,78 @@ body::before {
     background: linear-gradient(135deg, rgba(8, 145, 178, 0.15), rgba(8, 145, 178, 0.25));
     color: var(--role-parttime);
     border: 1px solid rgba(8, 145, 178, 0.3);
+}
+
+/* Shift badge with hours info */
+.shift-badge-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.shift-hours-info {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.shift-hours-info .paid {
+    color: var(--success);
+    font-weight: 600;
+}
+
+/* Totals Column/Row */
+.grid-cell.totals-cell {
+    background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.grid-cell.totals-cell .total-hours {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.grid-cell.totals-cell .gross-hours {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.grid-cell.totals-cell .paid-hours {
+    font-size: 0.75rem;
+    color: var(--success);
+    font-weight: 600;
+}
+
+/* Budget comparison in corner */
+.grid-cell.budget-cell {
+    background: linear-gradient(135deg, var(--dollarama-green), var(--dollarama-green-light));
+    color: white;
+    font-weight: 700;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.grid-cell.budget-cell .budget-label {
+    font-size: 0.65rem;
+    opacity: 0.85;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.grid-cell.budget-cell .budget-value {
+    font-size: 0.85rem;
+}
+
+.grid-cell.budget-cell.over-budget {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.grid-cell.budget-cell.under-budget {
+    background: linear-gradient(135deg, var(--success), #059669);
 }
 
 .shift-empty {

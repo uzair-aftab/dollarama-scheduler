@@ -1,5 +1,5 @@
 /**
- * Storage Layer for Dollarama Shift Scheduler v5.0
+ * Storage Layer for Dollarama Shift Scheduler v5.1
  * Handles localStorage persistence, roles, scheduling constraints, and data operations
  */
 
