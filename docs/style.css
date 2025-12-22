@@ -1,5 +1,5 @@
 /* =============================================================================
-   DOLLARAMA SHIFT SCHEDULER - MODERN UI v4.1
+   DOLLARAMA SHIFT SCHEDULER - MODERN UI v4.2
    Apple/Google-inspired design with glassmorphism and smooth animations
    ============================================================================= */
 
@@ -1911,5 +1911,98 @@ body::before {
     .intro-logo {
         width: 80px;
         height: 80px;
+    }
+}
+
+/* =============================================================================
+   MOUSE GLOW EFFECT (Intro Page)
+   ============================================================================= */
+.intro-mouse-glow {
+    position: fixed;
+    pointer-events: none;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+            rgba(254, 230, 14, 0.15) 0%,
+            rgba(254, 230, 14, 0.08) 30%,
+            rgba(254, 230, 14, 0.02) 60%,
+            transparent 80%);
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    transition: opacity 0.3s ease;
+    mix-blend-mode: screen;
+}
+
+.intro-mouse-glow.active {
+    animation: mouseGlowPulse 2s ease-in-out infinite;
+}
+
+@keyframes mouseGlowPulse {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+/* Mouse trail particles */
+.intro-trail-particle {
+    position: fixed;
+    pointer-events: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--dollarama-yellow);
+    z-index: 6;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    animation: trailFade 0.6s ease-out forwards;
+}
+
+@keyframes trailFade {
+    0% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0);
+    }
+}
+
+/* Interactive cards - tilt on mouse proximity */
+.intro-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.intro-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(254, 230, 14, 0.2);
+}
+
+/* Logo interaction */
+.intro-logo:hover {
+    animation: logoFloat 3s ease-in-out infinite, logoGlow 1s ease-in-out infinite alternate, logoSpin 1s ease-out;
+}
+
+@keyframes logoSpin {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-10px) rotate(10deg);
+    }
+
+    100% {
+        transform: translateY(0) rotate(0deg);
     }
 }

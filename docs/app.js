@@ -1,5 +1,5 @@
 /**
- * Dollarama Shift Scheduler - Main Application v4.1
+ * Dollarama Shift Scheduler - Main Application v4.2
  * Full interactive scheduling with role management and constraints
  */
 
@@ -78,8 +78,59 @@ function initIntroScreen() {
         return;
     }
 
-    // Dismiss on click
-    intro.addEventListener('click', () => {
+    // Create mouse glow element
+    const mouseGlow = document.createElement('div');
+    mouseGlow.className = 'intro-mouse-glow';
+    intro.appendChild(mouseGlow);
+
+    // Track mouse position with smooth movement
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let currentX = mouseX;
+    let currentY = mouseY;
+    let trailCounter = 0;
+
+    // Update glow position smoothly
+    function updateGlow() {
+        // Smooth interpolation
+        currentX += (mouseX - currentX) * 0.08;
+        currentY += (mouseY - currentY) * 0.08;
+
+        mouseGlow.style.left = currentX + 'px';
+        mouseGlow.style.top = currentY + 'px';
+
+        if (!intro.classList.contains('hidden')) {
+            requestAnimationFrame(updateGlow);
+        }
+    }
+    updateGlow();
+
+    // Mouse move handler
+    intro.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        mouseGlow.classList.add('active');
+
+        // Create trail particles periodically
+        trailCounter++;
+        if (trailCounter % 3 === 0) {
+            createTrailParticle(e.clientX, e.clientY, intro);
+        }
+    });
+
+    intro.addEventListener('mouseleave', () => {
+        mouseGlow.classList.remove('active');
+    });
+
+    // Dismiss on click with burst effect
+    intro.addEventListener('click', (e) => {
+        // Create burst of particles on click
+        for (let i = 0; i < 12; i++) {
+            setTimeout(() => {
+                createBurstParticle(e.clientX, e.clientY, intro, i);
+            }, i * 30);
+        }
+
         intro.classList.add('hiding');
         sessionStorage.setItem('intro_seen', 'true');
 
@@ -88,6 +139,48 @@ function initIntroScreen() {
             intro.classList.add('hidden');
         }, 800);
     });
+}
+
+// Create a trail particle that fades out
+function createTrailParticle(x, y, container) {
+    const particle = document.createElement('div');
+    particle.className = 'intro-trail-particle';
+    particle.style.left = x + 'px';
+    particle.style.top = y + 'px';
+    container.appendChild(particle);
+
+    // Remove after animation
+    setTimeout(() => particle.remove(), 600);
+}
+
+// Create burst particles on click
+function createBurstParticle(x, y, container, index) {
+    const particle = document.createElement('div');
+    particle.className = 'intro-trail-particle';
+
+    // Calculate direction
+    const angle = (index / 12) * Math.PI * 2;
+    const distance = 100 + Math.random() * 50;
+    const endX = x + Math.cos(angle) * distance;
+    const endY = y + Math.sin(angle) * distance;
+
+    particle.style.left = x + 'px';
+    particle.style.top = y + 'px';
+    particle.style.transition = 'all 0.5s ease-out';
+    particle.style.opacity = '1';
+    particle.style.animation = 'none';
+
+    container.appendChild(particle);
+
+    // Trigger burst animation
+    requestAnimationFrame(() => {
+        particle.style.left = endX + 'px';
+        particle.style.top = endY + 'px';
+        particle.style.opacity = '0';
+        particle.style.transform = 'translate(-50%, -50%) scale(2)';
+    });
+
+    setTimeout(() => particle.remove(), 500);
 }
 
 // =============================================================================
@@ -745,7 +838,7 @@ function renderScheduleGrid() {
         CONFIG.days.forEach(day => {
             const s = emp.shifts[day];
             if (s) {
-                html += `<div class="grid-cell"><span class="shift-badge" style="background: ${roleColor}20; color: ${roleColor}; border: 1px solid ${roleColor}40;">${s.shift}</span></div>`;
+                html += `<div class="grid-cell"><span class="shift-badge" style="background: ${roleColor}; color: white; border: 1px solid ${roleColor};">${s.shift}</span></div>`;
             } else {
                 html += `<div class="grid-cell"><span class="shift-empty">—</span></div>`;
             }
