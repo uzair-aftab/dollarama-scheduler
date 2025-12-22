@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dollarama Shift Scheduler</title>
+    <meta name="description" content="Weekly shift schedule viewer for Dollarama store employees">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">📅</span>
+                    <h1>Dollarama Shift Scheduler</h1>
+                </div>
+                <div class="header-actions">
+                    <button id="theme-toggle" class="btn btn-icon" aria-label="Toggle dark mode">
+                        <span class="icon-light">🌙</span>
+                        <span class="icon-dark">☀️</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Bar -->
+        <section class="stats-bar">
+            <div class="stat-card">
+                <span class="stat-value" id="stat-employees">--</span>
+                <span class="stat-label">Employees</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="stat-shifts">--</span>
+                <span class="stat-label">Shifts</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="stat-hours">--</span>
+                <span class="stat-label">Hours</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="stat-generated">--</span>
+                <span class="stat-label">Generated</span>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Schedule Grid -->
+            <section class="card schedule-section">
+                <div class="card-header">
+                    <h2>📋 Weekly Schedule</h2>
+                    <div class="view-toggle">
+                        <button class="btn btn-sm active" data-view="grid">Grid</button>
+                        <button class="btn btn-sm" data-view="list">List</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="schedule-grid" class="schedule-grid">
+                        <p class="loading">Loading schedule...</p>
+                    </div>
+                    <div id="schedule-list" class="schedule-list hidden">
+                        <!-- List view populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Employee Hours -->
+            <section class="card hours-section">
+                <div class="card-header">
+                    <h2>👥 Employee Hours</h2>
+                </div>
+                <div class="card-body">
+                    <div id="hours-summary" class="hours-grid">
+                        <p class="loading">Loading...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Shift Scheduler • Built with OR-Tools CP-SAT Solver</p>
+            <p class="footer-link">
+                <a href="https://github.com/uzair-aftab/dollarama-scheduler" target="_blank">View on GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

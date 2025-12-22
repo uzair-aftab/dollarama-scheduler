@@ -1,0 +1,534 @@
+{
+  "generated": "2025-12-22T00:27:24.270671",
+  "week_of": "2025-12-22",
+  "stats": {
+    "total_shifts": 42,
+    "total_hours": 280,
+    "employees_scheduled": 12
+  },
+  "employees": [
+    {
+      "name": "Sarah Chen",
+      "role": "ATL",
+      "scheduled_hours": 37,
+      "target_hours": 40,
+      "max_hours": 44
+    },
+    {
+      "name": "Marcus Johnson",
+      "role": "ATL",
+      "scheduled_hours": 39,
+      "target_hours": 40,
+      "max_hours": 44
+    },
+    {
+      "name": "Rachel Green",
+      "role": "ATL",
+      "scheduled_hours": 29,
+      "target_hours": 35,
+      "max_hours": 40
+    },
+    {
+      "name": "Emily Rodriguez",
+      "role": "FullTime",
+      "scheduled_hours": 32,
+      "target_hours": 38,
+      "max_hours": 40
+    },
+    {
+      "name": "David Kim",
+      "role": "FullTime",
+      "scheduled_hours": 16,
+      "target_hours": 38,
+      "max_hours": 40
+    },
+    {
+      "name": "Lisa Park",
+      "role": "FullTime",
+      "scheduled_hours": 32,
+      "target_hours": 36,
+      "max_hours": 40
+    },
+    {
+      "name": "Michael Torres",
+      "role": "FullTime",
+      "scheduled_hours": 32,
+      "target_hours": 38,
+      "max_hours": 40
+    },
+    {
+      "name": "Uzair Aftab",
+      "role": "PartTime",
+      "scheduled_hours": 4,
+      "target_hours": 20,
+      "max_hours": 24
+    },
+    {
+      "name": "Aisha Patel",
+      "role": "PartTime",
+      "scheduled_hours": 18,
+      "target_hours": 22,
+      "max_hours": 24
+    },
+    {
+      "name": "James Wilson",
+      "role": "PartTime",
+      "scheduled_hours": 15,
+      "target_hours": 16,
+      "max_hours": 20
+    },
+    {
+      "name": "Priya Sharma",
+      "role": "PartTime",
+      "scheduled_hours": 13,
+      "target_hours": 18,
+      "max_hours": 20
+    },
+    {
+      "name": "Kevin Martinez",
+      "role": "PartTime",
+      "scheduled_hours": 13,
+      "target_hours": 20,
+      "max_hours": 24
+    }
+  ],
+  "schedule": [
+    {
+      "employee": "Sarah Chen",
+      "role": "ATL",
+      "day": "Tuesday",
+      "shift_name": "Closer-ATL",
+      "start": 14,
+      "end": 21,
+      "shift": "14:00-21:00",
+      "hours": 7
+    },
+    {
+      "employee": "Sarah Chen",
+      "role": "ATL",
+      "day": "Thursday",
+      "shift_name": "Closer-ATL",
+      "start": 14,
+      "end": 21,
+      "shift": "14:00-21:00",
+      "hours": 7
+    },
+    {
+      "employee": "Sarah Chen",
+      "role": "ATL",
+      "day": "Friday",
+      "shift_name": "Opener-ATL",
+      "start": 6,
+      "end": 14,
+      "shift": "06:00-14:00",
+      "hours": 8
+    },
+    {
+      "employee": "Sarah Chen",
+      "role": "ATL",
+      "day": "Saturday",
+      "shift_name": "Opener-ATL",
+      "start": 6,
+      "end": 14,
+      "shift": "06:00-14:00",
+      "hours": 8
+    },
+    {
+      "employee": "Sarah Chen",
+      "role": "ATL",
+      "day": "Sunday",
+      "shift_name": "Closer-ATL",
+      "start": 14,
+      "end": 21,
+      "shift": "14:00-21:00",
+      "hours": 7
+    },
+    {
+      "employee": "Marcus Johnson",
+      "role": "ATL",
+      "day": "Monday",
+      "shift_name": "Opener-ATL",
+      "start": 6,
+      "end": 14,
+      "shift": "06:00-14:00",
+      "hours": 8
+    },
+    {
+      "employee": "Marcus Johnson",
+      "role": "ATL",
+      "day": "Tuesday",
+      "shift_name": "Opener-ATL",
+      "start": 6,
+      "end": 14,
+      "shift": "06:00-14:00",
+      "hours": 8
+    },
+    {
+      "employee": "Marcus Johnson",
+      "role": "ATL",
+      "day": "Wednesday",
+      "shift_name": "Opener-ATL",
+      "start": 6,
+      "end": 14,
+      "shift": "06:00-14:00",
+      "hours": 8
+    },
+    {
+      "employee": "Marcus Johnson",
+      "role": "ATL",
+      "day": "Friday",
+      "shift_name": "Closer-ATL",
+      "start": 14,
+      "end": 21,
+      "shift": "14:00-21:00",
+      "hours": 7
+    },
+    {
+      "employee": "Marcus Johnson",
+      "role": "ATL",
+      "day": "Sunday",
+      "shift_name": "Opener-ATL",
+      "start": 6,
+      "end": 14,
+      "shift": "06:00-14:00",
+      "hours": 8
+    },
+    {
+      "employee": "Rachel Green",
+      "role": "ATL",
+      "day": "Monday",
+      "shift_name": "Closer-ATL",
+      "start": 14,
+      "end": 21,
+      "shift": "14:00-21:00",
+      "hours": 7
+    },
+    {
+      "employee": "Rachel Green",
+      "role": "ATL",
+      "day": "Wednesday",
+      "shift_name": "Closer-ATL",
+      "start": 14,
+      "end": 21,
+      "shift": "14:00-21:00",
+      "hours": 7
+    },
+    {
+      "employee": "Rachel Green",
+      "role": "ATL",
+      "day": "Thursday",
+      "shift_name": "Opener-ATL",
+      "start": 6,
+      "end": 14,
+      "shift": "06:00-14:00",
+      "hours": 8
+    },
+    {
+      "employee": "Rachel Green",
+      "role": "ATL",
+      "day": "Saturday",
+      "shift_name": "Closer-ATL",
+      "start": 14,
+      "end": 21,
+      "shift": "14:00-21:00",
+      "hours": 7
+    },
+    {
+      "employee": "Emily Rodriguez",
+      "role": "FullTime",
+      "day": "Monday",
+      "shift_name": "Morning-FT",
+      "start": 6,
+      "end": 14,
+      "shift": "06:00-14:00",
+      "hours": 8
+    },
+    {
+      "employee": "Emily Rodriguez",
+      "role": "FullTime",
+      "day": "Tuesday",
+      "shift_name": "Morning-FT",
+      "start": 6,
+      "end": 14,
+      "shift": "06:00-14:00",
+      "hours": 8
+    },
+    {
+      "employee": "Emily Rodriguez",
+      "role": "FullTime",
+      "day": "Wednesday",
+      "shift_name": "Morning-FT",
+      "start": 6,
+      "end": 14,
+      "shift": "06:00-14:00",
+      "hours": 8
+    },
+    {
+      "employee": "Emily Rodriguez",
+      "role": "FullTime",
+      "day": "Thursday",
+      "shift_name": "Morning-FT",
+      "start": 6,
+      "end": 14,
+      "shift": "06:00-14:00",
+      "hours": 8
+    },
+    {
+      "employee": "David Kim",
+      "role": "FullTime",
+      "day": "Monday",
+      "shift_name": "Day-FT",
+      "start": 10,
+      "end": 18,
+      "shift": "10:00-18:00",
+      "hours": 8
+    },
+    {
+      "employee": "David Kim",
+      "role": "FullTime",
+      "day": "Friday",
+      "shift_name": "Morning-FT",
+      "start": 6,
+      "end": 14,
+      "shift": "06:00-14:00",
+      "hours": 8
+    },
+    {
+      "employee": "Lisa Park",
+      "role": "FullTime",
+      "day": "Wednesday",
+      "shift_name": "Day-FT",
+      "start": 10,
+      "end": 18,
+      "shift": "10:00-18:00",
+      "hours": 8
+    },
+    {
+      "employee": "Lisa Park",
+      "role": "FullTime",
+      "day": "Thursday",
+      "shift_name": "Day-FT",
+      "start": 10,
+      "end": 18,
+      "shift": "10:00-18:00",
+      "hours": 8
+    },
+    {
+      "employee": "Lisa Park",
+      "role": "FullTime",
+      "day": "Saturday",
+      "shift_name": "Day-FT",
+      "start": 10,
+      "end": 18,
+      "shift": "10:00-18:00",
+      "hours": 8
+    },
+    {
+      "employee": "Lisa Park",
+      "role": "FullTime",
+      "day": "Sunday",
+      "shift_name": "Day-FT",
+      "start": 10,
+      "end": 18,
+      "shift": "10:00-18:00",
+      "hours": 8
+    },
+    {
+      "employee": "Michael Torres",
+      "role": "FullTime",
+      "day": "Tuesday",
+      "shift_name": "Day-FT",
+      "start": 10,
+      "end": 18,
+      "shift": "10:00-18:00",
+      "hours": 8
+    },
+    {
+      "employee": "Michael Torres",
+      "role": "FullTime",
+      "day": "Friday",
+      "shift_name": "Day-FT",
+      "start": 10,
+      "end": 18,
+      "shift": "10:00-18:00",
+      "hours": 8
+    },
+    {
+      "employee": "Michael Torres",
+      "role": "FullTime",
+      "day": "Saturday",
+      "shift_name": "Morning-FT",
+      "start": 6,
+      "end": 14,
+      "shift": "06:00-14:00",
+      "hours": 8
+    },
+    {
+      "employee": "Michael Torres",
+      "role": "FullTime",
+      "day": "Sunday",
+      "shift_name": "Morning-FT",
+      "start": 6,
+      "end": 14,
+      "shift": "06:00-14:00",
+      "hours": 8
+    },
+    {
+      "employee": "Uzair Aftab",
+      "role": "PartTime",
+      "day": "Friday",
+      "shift_name": "Closer-PT",
+      "start": 17,
+      "end": 21,
+      "shift": "17:00-21:00",
+      "hours": 4
+    },
+    {
+      "employee": "Aisha Patel",
+      "role": "PartTime",
+      "day": "Monday",
+      "shift_name": "Afternoon-PT",
+      "start": 13,
+      "end": 18,
+      "shift": "13:00-18:00",
+      "hours": 5
+    },
+    {
+      "employee": "Aisha Patel",
+      "role": "PartTime",
+      "day": "Tuesday",
+      "shift_name": "Afternoon-PT",
+      "start": 13,
+      "end": 18,
+      "shift": "13:00-18:00",
+      "hours": 5
+    },
+    {
+      "employee": "Aisha Patel",
+      "role": "PartTime",
+      "day": "Wednesday",
+      "shift_name": "Closer-PT",
+      "start": 17,
+      "end": 21,
+      "shift": "17:00-21:00",
+      "hours": 4
+    },
+    {
+      "employee": "Aisha Patel",
+      "role": "PartTime",
+      "day": "Thursday",
+      "shift_name": "Closer-PT",
+      "start": 17,
+      "end": 21,
+      "shift": "17:00-21:00",
+      "hours": 4
+    },
+    {
+      "employee": "James Wilson",
+      "role": "PartTime",
+      "day": "Friday",
+      "shift_name": "Afternoon-PT",
+      "start": 13,
+      "end": 18,
+      "shift": "13:00-18:00",
+      "hours": 5
+    },
+    {
+      "employee": "James Wilson",
+      "role": "PartTime",
+      "day": "Saturday",
+      "shift_name": "Afternoon-PT",
+      "start": 13,
+      "end": 18,
+      "shift": "13:00-18:00",
+      "hours": 5
+    },
+    {
+      "employee": "James Wilson",
+      "role": "PartTime",
+      "day": "Sunday",
+      "shift_name": "Afternoon-PT",
+      "start": 13,
+      "end": 18,
+      "shift": "13:00-18:00",
+      "hours": 5
+    },
+    {
+      "employee": "Priya Sharma",
+      "role": "PartTime",
+      "day": "Thursday",
+      "shift_name": "Afternoon-PT",
+      "start": 13,
+      "end": 18,
+      "shift": "13:00-18:00",
+      "hours": 5
+    },
+    {
+      "employee": "Priya Sharma",
+      "role": "PartTime",
+      "day": "Saturday",
+      "shift_name": "Closer-PT",
+      "start": 17,
+      "end": 21,
+      "shift": "17:00-21:00",
+      "hours": 4
+    },
+    {
+      "employee": "Priya Sharma",
+      "role": "PartTime",
+      "day": "Sunday",
+      "shift_name": "Closer-PT",
+      "start": 17,
+      "end": 21,
+      "shift": "17:00-21:00",
+      "hours": 4
+    },
+    {
+      "employee": "Kevin Martinez",
+      "role": "PartTime",
+      "day": "Monday",
+      "shift_name": "Closer-PT",
+      "start": 17,
+      "end": 21,
+      "shift": "17:00-21:00",
+      "hours": 4
+    },
+    {
+      "employee": "Kevin Martinez",
+      "role": "PartTime",
+      "day": "Tuesday",
+      "shift_name": "Closer-PT",
+      "start": 17,
+      "end": 21,
+      "shift": "17:00-21:00",
+      "hours": 4
+    },
+    {
+      "employee": "Kevin Martinez",
+      "role": "PartTime",
+      "day": "Wednesday",
+      "shift_name": "Afternoon-PT",
+      "start": 13,
+      "end": 18,
+      "shift": "13:00-18:00",
+      "hours": 5
+    }
+  ],
+  "days": [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  ],
+  "shifts": [
+    "Opener-ATL",
+    "Morning-FT",
+    "Day-FT",
+    "Afternoon-PT",
+    "Closer-ATL",
+    "Closer-PT"
+  ]
+}

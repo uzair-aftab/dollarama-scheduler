@@ -1,0 +1,9 @@
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+.env
+venv/
+schedule_*.xlsx
+schedule_*.csv
+.DS_Store
+*.log
