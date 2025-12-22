@@ -1,5 +1,5 @@
 /**
- * Dollarama Shift Scheduler - Main Application v5.0
+ * Dollarama Shift Scheduler - Main Application v5.1
  * Full interactive scheduling with role management and constraints
  */
 
@@ -457,8 +457,14 @@ function initEmployeeForm() {
     // Save button
     document.getElementById('save-employee-btn').addEventListener('click', saveEmployee);
 
-    // Employment status change - update max hours hint
-    document.getElementById('emp-status').addEventListener('change', updateMaxHoursHint);
+    // Employment status change - update max hours hint and show/hide break checkbox
+    document.getElementById('emp-status').addEventListener('change', () => {
+        updateMaxHoursHint();
+        toggleBreakStatusRow();
+    });
+
+    // Break status change - update max hours hint
+    document.getElementById('emp-on-break').addEventListener('change', updateMaxHoursHint);
 }
 
 function buildAvailabilityGrid() {
@@ -529,8 +535,12 @@ function openEmployeeModal(employee = null) {
     document.getElementById('emp-name').value = employee?.name || '';
     document.getElementById('emp-role').value = employee?.role || 'PartTime';
     document.getElementById('emp-status').value = employee?.employmentStatus || 'Citizen';
+    document.getElementById('emp-on-break').checked = employee?.onScheduledBreak || false;
     document.getElementById('emp-target').value = employee?.targetHours || 20;
     document.getElementById('emp-max').value = employee?.maxHours || 24;
+
+    // Show/hide break checkbox based on status
+    toggleBreakStatusRow();
 
     // Update max hours hint for international students
     updateMaxHoursHint();
@@ -557,16 +567,42 @@ function openEmployeeModal(employee = null) {
     openModal('employee-modal');
 }
 
-// Update hint text when employment status changes
+// Toggle visibility of break status row
+function toggleBreakStatusRow() {
+    const status = document.getElementById('emp-status').value;
+    const breakRow = document.getElementById('break-status-row');
+    if (status === 'InternationalStudent') {
+        breakRow.style.display = 'flex';
+    } else {
+        breakRow.style.display = 'none';
+        document.getElementById('emp-on-break').checked = false;
+    }
+}
+
+// Update hint text when employment status or break status changes
 function updateMaxHoursHint() {
     const status = document.getElementById('emp-status').value;
+    const onBreak = document.getElementById('emp-on-break').checked;
     const hint = document.getElementById('emp-max-hint');
+    const maxInput = document.getElementById('emp-max');
+
     if (status === 'InternationalStudent') {
         const settings = Storage.getSettings();
-        hint.textContent = `Maximum ${settings.internationalStudentMaxHours || 24}hrs for international students`;
-        hint.style.color = 'var(--warning)';
+        const baseMax = settings.internationalStudentMaxHours || 24;
+        const effectiveMax = onBreak ? 40 : baseMax;
+
+        hint.textContent = onBreak
+            ? `On break: can work up to 40hrs/week`
+            : `Maximum ${baseMax}hrs/week during school term`;
+
+        // Enforce max on input
+        maxInput.max = effectiveMax;
+        if (parseInt(maxInput.value) > effectiveMax) {
+            maxInput.value = effectiveMax;
+        }
     } else {
         hint.textContent = '';
+        maxInput.max = 60;
     }
 }
 
@@ -574,13 +610,14 @@ function saveEmployee() {
     const name = document.getElementById('emp-name').value.trim();
     const role = document.getElementById('emp-role').value;
     const employmentStatus = document.getElementById('emp-status').value;
+    const onScheduledBreak = document.getElementById('emp-on-break').checked;
     const targetHours = parseInt(document.getElementById('emp-target').value);
     let maxHours = parseInt(document.getElementById('emp-max').value);
 
-    // Enforce 24hr cap for international students
+    // Enforce max hours for international students based on break status
     if (employmentStatus === 'InternationalStudent') {
         const settings = Storage.getSettings();
-        const intlMax = settings.internationalStudentMaxHours || 24;
+        const intlMax = onScheduledBreak ? 40 : (settings.internationalStudentMaxHours || 24);
         if (maxHours > intlMax) {
             maxHours = intlMax;
             showToast(`Max hours capped to ${intlMax} for international students`, 'warning');
@@ -603,7 +640,7 @@ function saveEmployee() {
         }
     }
 
-    const employee = { name, role, employmentStatus, targetHours, maxHours, availability };
+    const employee = { name, role, employmentStatus, onScheduledBreak, targetHours, maxHours, availability };
 
     if (editingEmployeeId) {
         Storage.updateEmployee(editingEmployeeId, employee);
@@ -859,6 +896,8 @@ function renderScheduleGrid() {
     const container = document.getElementById('schedule-grid');
     const schedule = currentSchedule.schedule;
     const roles = Storage.getRoles();
+    const settings = Storage.getSettings();
+    const storeWeeklyBudget = settings.storeWeeklyHours || 280;
 
     // Group by employee
     const byEmployee = {};
@@ -874,25 +913,89 @@ function renderScheduleGrid() {
         return roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role);
     });
 
+    // Calculate daily totals
+    const dailyTotals = {};
+    const dailyPaidTotals = {};
+    CONFIG.days.forEach(day => {
+        dailyTotals[day] = 0;
+        dailyPaidTotals[day] = 0;
+    });
+
+    let weekGrossTotal = 0;
+    let weekPaidTotal = 0;
+
+    // Header row
     let html = '<div class="grid-header employee-col">Employee</div>';
     CONFIG.days.forEach(d => {
         html += `<div class="grid-header">${CONFIG.dayAbbrev[d]}</div>`;
     });
+    html += '<div class="grid-header">Total</div>';
 
+    // Employee rows
     employees.forEach(emp => {
         const role = roles.find(r => r.name === emp.role);
         const roleColor = role?.color || '#666';
 
+        let empGross = 0;
+        let empPaid = 0;
+
         html += `<div class="grid-cell employee-cell">${emp.name}</div>`;
+
         CONFIG.days.forEach(day => {
             const s = emp.shifts[day];
             if (s) {
-                html += `<div class="grid-cell"><span class="shift-badge" style="background: ${roleColor}; color: white; border: 1px solid ${roleColor};">${s.shift}</span></div>`;
+                const hours = s.hours || (s.end - s.start);
+                const paidHours = s.paidHours || hours;
+                const hasBreak = s.hasBreak || false;
+
+                empGross += hours;
+                empPaid += paidHours;
+                dailyTotals[day] += hours;
+                dailyPaidTotals[day] += paidHours;
+
+                const breakNote = hasBreak ? `<div class="shift-hours-info"><span class="paid">${paidHours}h paid</span></div>` : '';
+                html += `<div class="grid-cell">
+                    <div class="shift-badge-wrapper">
+                        <span class="shift-badge" style="background: ${roleColor}; color: white; border: 1px solid ${roleColor};">${s.shift}</span>
+                        ${breakNote}
+                    </div>
+                </div>`;
             } else {
                 html += `<div class="grid-cell"><span class="shift-empty">—</span></div>`;
             }
         });
+
+        // Employee total column
+        weekGrossTotal += empGross;
+        weekPaidTotal += empPaid;
+        html += `<div class="grid-cell totals-cell">
+            <div class="total-hours">
+                <span class="gross-hours">${empGross}h</span>
+                ${empGross !== empPaid ? `<span class="paid-hours">${empPaid}h paid</span>` : ''}
+            </div>
+        </div>`;
     });
+
+    // Footer row (daily totals)
+    html += '<div class="grid-cell totals-cell" style="justify-content: flex-start; font-weight: 700;">Daily Total</div>';
+    CONFIG.days.forEach(day => {
+        const gross = dailyTotals[day];
+        const paid = dailyPaidTotals[day];
+        html += `<div class="grid-cell totals-cell">
+            <div class="total-hours">
+                <span class="gross-hours">${gross}h</span>
+                ${gross !== paid ? `<span class="paid-hours">${paid}h paid</span>` : ''}
+            </div>
+        </div>`;
+    });
+
+    // Corner cell - budget comparison
+    const budgetDiff = weekPaidTotal - storeWeeklyBudget;
+    const budgetClass = budgetDiff > 0 ? 'over-budget' : (budgetDiff < -20 ? 'under-budget' : '');
+    html += `<div class="grid-cell totals-cell budget-cell ${budgetClass}">
+        <span class="budget-label">vs Budget</span>
+        <span class="budget-value">${weekPaidTotal}/${storeWeeklyBudget}h</span>
+    </div>`;
 
     container.innerHTML = html;
     container.classList.add('loaded');

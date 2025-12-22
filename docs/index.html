@@ -9,7 +9,9 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&family=Inter:opsz,wght@14..32,100..900&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
@@ -312,7 +314,7 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>Shift Scheduler v5.0 • Built with JavaScript</p>
+            <p>Shift Scheduler v5.1 • Built with JavaScript</p>
             <p class="footer-link">
                 <a href="https://github.com/uzair-aftab/dollarama-scheduler" target="_blank">View on GitHub</a>
             </p>
@@ -352,8 +354,18 @@
                             <select id="emp-status" required>
                                 <option value="Citizen">Citizen</option>
                                 <option value="PR">Permanent Resident</option>
-                                <option value="InternationalStudent">International Student (24hr max)</option>
+                                <option value="InternationalStudent">International Student</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row" id="break-status-row" style="display: none;">
+                        <div class="form-group form-group-checkbox">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="emp-on-break">
+                                <span class="checkbox-text">On Scheduled Break (can work up to 40hrs/week)</span>
+                            </label>
+                            <small class="hint">Check if the student is on winter/summer break from school</small>
                         </div>
                     </div>
 
@@ -365,7 +377,7 @@
                         <div class="form-group">
                             <label for="emp-max">Max Hours</label>
                             <input type="number" id="emp-max" min="0" max="60" value="24" required>
-                            <small class="hint" id="emp-max-hint"></small>
+                            <small class="hint-warning" id="emp-max-hint"></small>
                         </div>
                     </div>
 
@@ -458,13 +470,15 @@
                     <input type="hidden" id="role-id">
 
                     <div class="form-group">
-                        <label for="role-name">Role Name (ID)</label>
-                        <input type="text" id="role-name" required placeholder="e.g., Cashier">
+                        <label for="role-name">Role ID</label>
+                        <input type="text" id="role-name" required placeholder="cashier">
+                        <small class="hint">Unique identifier, lowercase, no spaces (e.g., cashier, stock_clerk)</small>
                     </div>
 
                     <div class="form-group">
-                        <label for="role-label">Display Label</label>
-                        <input type="text" id="role-label" required placeholder="e.g., Cashier">
+                        <label for="role-label">Display Name</label>
+                        <input type="text" id="role-label" required placeholder="Cashier">
+                        <small class="hint">Friendly name shown in the UI (e.g., Cashier, Stock Clerk)</small>
                     </div>
 
                     <div class="form-group">
