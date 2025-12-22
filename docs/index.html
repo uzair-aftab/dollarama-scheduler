@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dollarama Shift Scheduler</title>
-    <meta name="description" content="Weekly shift schedule viewer for Dollarama store employees">
+    <meta name="description" content="Interactive shift scheduling tool with constraint-based optimization">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="app-container">
         <!-- Header -->
@@ -20,16 +22,33 @@
                     <h1>Dollarama Shift Scheduler</h1>
                 </div>
                 <div class="header-actions">
+                    <button id="run-scheduler-btn" class="btn btn-primary">
+                        <span>▶️</span> Run Scheduler
+                    </button>
                     <button id="theme-toggle" class="btn btn-icon" aria-label="Toggle dark mode">
                         <span class="icon-light">🌙</span>
                         <span class="icon-dark">☀️</span>
                     </button>
+                    <div class="dropdown">
+                        <button class="btn btn-icon" id="menu-btn">⋮</button>
+                        <div class="dropdown-menu" id="dropdown-menu">
+                            <button id="export-btn">📤 Export Data</button>
+                            <button id="import-btn">📥 Import Data</button>
+                            <button id="reset-btn">🔄 Reset to Defaults</button>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <!-- Tab Navigation -->
+            <nav class="tab-nav">
+                <button class="tab-btn active" data-tab="schedule">📋 Schedule</button>
+                <button class="tab-btn" data-tab="employees">👥 Employees</button>
+                <button class="tab-btn" data-tab="shifts">⏰ Shifts</button>
+            </nav>
         </header>
 
         <!-- Stats Bar -->
-        <section class="stats-bar">
+        <section class="stats-bar" id="stats-bar">
             <div class="stat-card">
                 <span class="stat-value" id="stat-employees">--</span>
                 <span class="stat-label">Employees</span>
@@ -43,40 +62,70 @@
                 <span class="stat-label">Hours</span>
             </div>
             <div class="stat-card">
-                <span class="stat-value" id="stat-generated">--</span>
-                <span class="stat-label">Generated</span>
+                <span class="stat-value" id="stat-status">--</span>
+                <span class="stat-label">Status</span>
             </div>
         </section>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Schedule Grid -->
-            <section class="card schedule-section">
-                <div class="card-header">
-                    <h2>📋 Weekly Schedule</h2>
-                    <div class="view-toggle">
-                        <button class="btn btn-sm active" data-view="grid">Grid</button>
-                        <button class="btn btn-sm" data-view="list">List</button>
+            <!-- SCHEDULE TAB -->
+            <section class="tab-content active" id="tab-schedule">
+                <div class="card schedule-section">
+                    <div class="card-header">
+                        <h2>📋 Weekly Schedule</h2>
+                        <div class="view-toggle">
+                            <button class="btn btn-sm active" data-view="grid">Grid</button>
+                            <button class="btn btn-sm" data-view="list">List</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="schedule-grid" class="schedule-grid">
+                            <div class="empty-state">
+                                <p>🚀 Click <strong>Run Scheduler</strong> to generate a schedule</p>
+                            </div>
+                        </div>
+                        <div id="schedule-list" class="schedule-list hidden"></div>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div id="schedule-grid" class="schedule-grid">
-                        <p class="loading">Loading schedule...</p>
+
+                <div class="card hours-section">
+                    <div class="card-header">
+                        <h2>👥 Employee Hours</h2>
                     </div>
-                    <div id="schedule-list" class="schedule-list hidden">
-                        <!-- List view populated by JS -->
+                    <div class="card-body">
+                        <div id="hours-summary" class="hours-grid">
+                            <div class="empty-state">
+                                <p>Run the scheduler to see hours summary</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Employee Hours -->
-            <section class="card hours-section">
-                <div class="card-header">
-                    <h2>👥 Employee Hours</h2>
+            <!-- EMPLOYEES TAB -->
+            <section class="tab-content" id="tab-employees">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>👥 Employees</h2>
+                        <button class="btn btn-primary" id="add-employee-btn">+ Add Employee</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="employee-list" class="employee-list"></div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div id="hours-summary" class="hours-grid">
-                        <p class="loading">Loading...</p>
+            </section>
+
+            <!-- SHIFTS TAB -->
+            <section class="tab-content" id="tab-shifts">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>⏰ Shift Templates</h2>
+                        <button class="btn btn-primary" id="add-shift-btn">+ Add Shift</button>
+                    </div>
+                    <div class="card-body">
+                        <p class="hint">These shift templates are applied to each day of the week.</p>
+                        <div id="shift-list" class="shift-list"></div>
                     </div>
                 </div>
             </section>
@@ -84,13 +133,135 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>Shift Scheduler • Built with OR-Tools CP-SAT Solver</p>
+            <p>Shift Scheduler v2.0 • Built with JavaScript</p>
             <p class="footer-link">
                 <a href="https://github.com/uzair-aftab/dollarama-scheduler" target="_blank">View on GitHub</a>
             </p>
         </footer>
     </div>
 
+    <!-- MODAL: Employee Form -->
+    <div class="modal-overlay" id="employee-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="employee-modal-title">Add Employee</h3>
+                <button class="btn btn-icon modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="employee-form">
+                    <input type="hidden" id="emp-id">
+
+                    <div class="form-group">
+                        <label for="emp-name">Name</label>
+                        <input type="text" id="emp-name" required placeholder="Enter employee name">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="emp-role">Role</label>
+                            <select id="emp-role" required>
+                                <option value="ATL">ATL (Manager)</option>
+                                <option value="FullTime">Full Time</option>
+                                <option value="PartTime">Part Time</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="emp-target">Target Hours</label>
+                            <input type="number" id="emp-target" min="0" max="60" value="20" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="emp-max">Max Hours</label>
+                            <input type="number" id="emp-max" min="0" max="60" value="24" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Availability</label>
+                        <p class="hint">Click to toggle availability. Drag to set time range.</p>
+                        <div class="availability-grid" id="availability-grid"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="cancel-employee-btn">Cancel</button>
+                <button class="btn btn-primary" id="save-employee-btn">Save Employee</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Shift Form -->
+    <div class="modal-overlay" id="shift-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="shift-modal-title">Add Shift</h3>
+                <button class="btn btn-icon modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="shift-form">
+                    <input type="hidden" id="shift-id">
+
+                    <div class="form-group">
+                        <label for="shift-name">Shift Name</label>
+                        <input type="text" id="shift-name" required placeholder="e.g., Morning-FT">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="shift-start">Start Time</label>
+                            <select id="shift-start" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="shift-end">End Time</label>
+                            <select id="shift-end" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="shift-role">Required Role</label>
+                            <select id="shift-role" required>
+                                <option value="ATL">ATL (Manager)</option>
+                                <option value="FullTime">Full Time</option>
+                                <option value="PartTime">Part Time</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="shift-preview">
+                        <span id="shift-duration">8 hours</span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="cancel-shift-btn">Cancel</button>
+                <button class="btn btn-primary" id="save-shift-btn">Save Shift</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Confirm Dialog -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h3>Confirm</h3>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message">Are you sure?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="confirm-cancel">Cancel</button>
+                <button class="btn btn-danger" id="confirm-ok">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="import-file" accept=".json" style="display:none">
+
+    <!-- Scripts -->
+    <script src="storage.js"></script>
+    <script src="scheduler.js"></script>
     <script src="app.js"></script>
 </body>
+
 </html>
