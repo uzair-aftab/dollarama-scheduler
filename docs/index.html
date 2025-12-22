@@ -13,6 +13,82 @@
 </head>
 
 <body>
+    <!-- Intro Splash Screen -->
+    <div class="intro-overlay" id="intro-overlay">
+        <!-- Animated background -->
+        <div class="intro-bg-grid"></div>
+
+        <!-- Floating particles -->
+        <div class="intro-particles">
+            <div class="intro-particle"></div>
+            <div class="intro-particle"></div>
+            <div class="intro-particle"></div>
+            <div class="intro-particle"></div>
+            <div class="intro-particle"></div>
+            <div class="intro-particle"></div>
+            <div class="intro-particle"></div>
+            <div class="intro-particle"></div>
+            <div class="intro-particle"></div>
+        </div>
+
+        <!-- Main content -->
+        <div class="intro-content">
+            <!-- Logo -->
+            <svg class="intro-logo" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="120" height="120" rx="24" fill="#003F24" />
+                <rect x="8" y="8" width="104" height="104" rx="20" fill="#004d2d" fill-opacity="0.5" />
+                <text x="60" y="78" text-anchor="middle" fill="#FEE60E" font-size="60" font-weight="bold"
+                    font-family="Inter, sans-serif">D</text>
+            </svg>
+
+            <!-- Title -->
+            <h1 class="intro-title">Shift <span>Scheduler</span></h1>
+            <p class="intro-subtitle">Inspired by Dollarama</p>
+
+            <!-- Feature highlights -->
+            <div class="intro-features">
+                <div class="intro-feature">
+                    <span class="intro-feature-icon">📅</span>
+                    <span>Smart Scheduling</span>
+                </div>
+                <div class="intro-feature">
+                    <span class="intro-feature-icon">👥</span>
+                    <span>Team Management</span>
+                </div>
+                <div class="intro-feature">
+                    <span class="intro-feature-icon">⚡</span>
+                    <span>Auto-Optimization</span>
+                </div>
+                <div class="intro-feature">
+                    <span class="intro-feature-icon">🌙</span>
+                    <span>Dark Mode</span>
+                </div>
+            </div>
+
+            <!-- Preview cards -->
+            <div class="intro-preview">
+                <div class="intro-card">
+                    <div class="intro-card-day">Monday</div>
+                    <div class="intro-card-shift">06:00 - 14:00</div>
+                </div>
+                <div class="intro-card">
+                    <div class="intro-card-day">Wednesday</div>
+                    <div class="intro-card-shift">10:00 - 18:00</div>
+                </div>
+                <div class="intro-card">
+                    <div class="intro-card-day">Saturday</div>
+                    <div class="intro-card-shift">14:00 - 21:00</div>
+                </div>
+            </div>
+
+            <!-- Click hint -->
+            <div class="intro-hint">
+                <div class="intro-hint-icon">👆</div>
+                <span>Click anywhere to enter</span>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Header -->
         <header class="header">
@@ -183,7 +259,7 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>Shift Scheduler v4.0 • Built with JavaScript</p>
+            <p>Shift Scheduler v4.1 • Built with JavaScript</p>
             <p class="footer-link">
                 <a href="https://github.com/uzair-aftab/dollarama-scheduler" target="_blank">View on GitHub</a>
             </p>

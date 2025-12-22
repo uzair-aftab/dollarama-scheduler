@@ -1,5 +1,5 @@
 /* =============================================================================
-   DOLLARAMA SHIFT SCHEDULER - MODERN UI v4.0
+   DOLLARAMA SHIFT SCHEDULER - MODERN UI v4.1
    Apple/Google-inspired design with glassmorphism and smooth animations
    ============================================================================= */
 
@@ -76,15 +76,20 @@
     --bg-secondary: rgba(18, 38, 28, 0.9);
     --bg-tertiary: #142820;
     --bg-glass: rgba(18, 38, 28, 0.8);
-    --text-primary: #e8f5ee;
-    --text-secondary: #a7c9b8;
-    --text-muted: #6b9980;
-    --border-color: rgba(254, 230, 14, 0.1);
-    --border-glass: rgba(254, 230, 14, 0.1);
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.4);
-    --shadow-glow: 0 0 30px rgba(254, 230, 14, 0.1);
+    --text-primary: #f0f8f4;
+    --text-secondary: #c5e0d3;
+    --text-muted: #8ab89f;
+    --border-color: rgba(254, 230, 14, 0.15);
+    --border-glass: rgba(254, 230, 14, 0.15);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 30px rgba(254, 230, 14, 0.15);
+
+    /* Brighter role colors for dark mode contrast */
+    --role-atl: #a78bfa;
+    --role-fulltime: #4ade80;
+    --role-parttime: #22d3ee;
 }
 
 /* =============================================================================
@@ -1528,4 +1533,383 @@ body::before {
 
 [data-theme="dark"] .highlight-green {
     color: #4ade80;
+}
+
+/* =============================================================================
+   INTRO SPLASH PAGE
+   ============================================================================= */
+.intro-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: linear-gradient(135deg, var(--dollarama-green) 0%, var(--dollarama-green-dark) 50%, #001a10 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: opacity 0.8s ease-out, transform 0.6s ease-out;
+}
+
+.intro-overlay.hiding {
+    opacity: 0;
+    transform: scale(1.1);
+    pointer-events: none;
+}
+
+.intro-overlay.hidden {
+    display: none;
+}
+
+/* Animated background grid */
+.intro-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(254, 230, 14, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(254, 230, 14, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(60px, 60px);
+    }
+}
+
+/* Floating particles */
+.intro-particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.intro-particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--dollarama-yellow);
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: floatParticle 15s infinite ease-in-out;
+}
+
+.intro-particle:nth-child(1) {
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 12s;
+}
+
+.intro-particle:nth-child(2) {
+    left: 20%;
+    animation-delay: 2s;
+    animation-duration: 14s;
+}
+
+.intro-particle:nth-child(3) {
+    left: 30%;
+    animation-delay: 4s;
+    animation-duration: 16s;
+}
+
+.intro-particle:nth-child(4) {
+    left: 40%;
+    animation-delay: 1s;
+    animation-duration: 13s;
+}
+
+.intro-particle:nth-child(5) {
+    left: 50%;
+    animation-delay: 3s;
+    animation-duration: 15s;
+}
+
+.intro-particle:nth-child(6) {
+    left: 60%;
+    animation-delay: 5s;
+    animation-duration: 17s;
+}
+
+.intro-particle:nth-child(7) {
+    left: 70%;
+    animation-delay: 2s;
+    animation-duration: 14s;
+}
+
+.intro-particle:nth-child(8) {
+    left: 80%;
+    animation-delay: 4s;
+    animation-duration: 12s;
+}
+
+.intro-particle:nth-child(9) {
+    left: 90%;
+    animation-delay: 0s;
+    animation-duration: 16s;
+}
+
+@keyframes floatParticle {
+
+    0%,
+    100% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.3;
+        transform: translateY(90vh) scale(1);
+    }
+
+    90% {
+        opacity: 0.3;
+        transform: translateY(10vh) scale(1);
+    }
+
+    100% {
+        transform: translateY(-10vh) scale(0);
+        opacity: 0;
+    }
+}
+
+/* Main logo container */
+.intro-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    animation: fadeInScale 1s ease-out;
+}
+
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Logo animation */
+.intro-logo {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 2rem;
+    animation: logoFloat 3s ease-in-out infinite, logoGlow 2s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 30px rgba(254, 230, 14, 0.4));
+}
+
+@keyframes logoFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes logoGlow {
+    0% {
+        filter: drop-shadow(0 0 20px rgba(254, 230, 14, 0.3));
+    }
+
+    100% {
+        filter: drop-shadow(0 0 40px rgba(254, 230, 14, 0.6));
+    }
+}
+
+.intro-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.intro-title span {
+    color: var(--dollarama-yellow);
+}
+
+.intro-subtitle {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 3rem;
+    font-weight: 500;
+}
+
+/* Floating schedule preview cards */
+.intro-preview {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    perspective: 1000px;
+}
+
+.intro-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(254, 230, 14, 0.2);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    color: white;
+    animation: cardFloat 4s ease-in-out infinite;
+    transform-style: preserve-3d;
+}
+
+.intro-card:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.intro-card:nth-child(2) {
+    animation-delay: 0.5s;
+}
+
+.intro-card:nth-child(3) {
+    animation-delay: 1s;
+}
+
+@keyframes cardFloat {
+
+    0%,
+    100% {
+        transform: translateY(0) rotateX(0deg);
+    }
+
+    50% {
+        transform: translateY(-8px) rotateX(5deg);
+    }
+}
+
+.intro-card-day {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    margin-bottom: 0.25rem;
+}
+
+.intro-card-shift {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--dollarama-yellow);
+}
+
+/* Click to enter hint */
+.intro-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.875rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.intro-hint-icon {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: ripple 2s ease-out infinite;
+}
+
+@keyframes ripple {
+    0% {
+        box-shadow: 0 0 0 0 rgba(254, 230, 14, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 15px rgba(254, 230, 14, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(254, 230, 14, 0);
+    }
+}
+
+/* Features showcase */
+.intro-features {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.intro-feature {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.875rem;
+    animation: featureFade 0.5s ease-out backwards;
+}
+
+.intro-feature:nth-child(1) {
+    animation-delay: 0.5s;
+}
+
+.intro-feature:nth-child(2) {
+    animation-delay: 0.7s;
+}
+
+.intro-feature:nth-child(3) {
+    animation-delay: 0.9s;
+}
+
+.intro-feature:nth-child(4) {
+    animation-delay: 1.1s;
+}
+
+@keyframes featureFade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.intro-feature-icon {
+    font-size: 1.25rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .intro-title {
+        font-size: 2rem;
+    }
+
+    .intro-subtitle {
+        font-size: 1rem;
+    }
+
+    .intro-preview {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .intro-features {
+        gap: 1rem;
+    }
+
+    .intro-logo {
+        width: 80px;
+        height: 80px;
+    }
 }
