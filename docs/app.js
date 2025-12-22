@@ -1,6 +1,6 @@
 /**
- * Dollarama Shift Scheduler - Main Application v2.0
- * Full interactive scheduling application
+ * Dollarama Shift Scheduler - Main Application v4.0
+ * Full interactive scheduling with role management and constraints
  */
 
 // =============================================================================
@@ -20,6 +20,7 @@ let currentTab = 'schedule';
 let currentSchedule = null;
 let editingEmployeeId = null;
 let editingShiftId = null;
+let editingRoleId = null;
 let availabilityState = {};
 let confirmCallback = null;
 
@@ -34,12 +35,16 @@ document.addEventListener('DOMContentLoaded', () => {
     initModals();
     initEmployeeForm();
     initShiftForm();
+    initRoleForm();
+    initSettingsForm();
     initViewToggle();
     initImportExport();
 
     // Load initial data
     renderEmployeeList();
     renderShiftList();
+    renderRoleList();
+    loadSettings();
     updateStats();
 
     // Try to load last schedule
@@ -51,6 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Run scheduler button
     document.getElementById('run-scheduler-btn').addEventListener('click', runScheduler);
+
+    // Populate dynamic role options
+    updateRoleDropdowns();
 });
 
 // =============================================================================
@@ -118,7 +126,10 @@ function initDropdown() {
             currentSchedule = null;
             renderEmployeeList();
             renderShiftList();
+            renderRoleList();
+            loadSettings();
             updateStats();
+            updateRoleDropdowns();
             document.getElementById('schedule-grid').innerHTML = '<div class="empty-state"><p>🚀 Click <strong>Run Scheduler</strong> to generate a schedule</p></div>';
             document.getElementById('hours-summary').innerHTML = '<div class="empty-state"><p>Run the scheduler to see hours summary</p></div>';
             showToast('Data reset to defaults', 'success');
@@ -139,6 +150,7 @@ function initModals() {
     // Cancel buttons
     document.getElementById('cancel-employee-btn').addEventListener('click', () => closeModal('employee-modal'));
     document.getElementById('cancel-shift-btn').addEventListener('click', () => closeModal('shift-modal'));
+    document.getElementById('cancel-role-btn').addEventListener('click', () => closeModal('role-modal'));
     document.getElementById('confirm-cancel').addEventListener('click', () => closeModal('confirm-modal'));
 
     // Click outside to close
@@ -151,6 +163,7 @@ function initModals() {
     // Add buttons
     document.getElementById('add-employee-btn').addEventListener('click', () => openEmployeeModal());
     document.getElementById('add-shift-btn').addEventListener('click', () => openShiftModal());
+    document.getElementById('add-role-btn').addEventListener('click', () => openRoleModal());
 }
 
 function openModal(id) {
@@ -174,6 +187,123 @@ function showConfirm(message, callback) {
         closeModal('confirm-modal');
         if (confirmCallback) confirmCallback();
     };
+}
+
+// =============================================================================
+// ROLE MANAGEMENT
+// =============================================================================
+
+function initRoleForm() {
+    document.getElementById('save-role-btn').addEventListener('click', saveRole);
+}
+
+function openRoleModal(role = null) {
+    editingRoleId = role ? role.id : null;
+    document.getElementById('role-modal-title').textContent = role ? 'Edit Role' : 'Add Role';
+
+    document.getElementById('role-id').value = role?.id || '';
+    document.getElementById('role-name').value = role?.name || '';
+    document.getElementById('role-label').value = role?.label || '';
+    document.getElementById('role-color').value = role?.color || '#003F24';
+
+    openModal('role-modal');
+}
+
+function saveRole() {
+    const name = document.getElementById('role-name').value.trim();
+    const label = document.getElementById('role-label').value.trim();
+    const color = document.getElementById('role-color').value;
+
+    if (!name || !label) {
+        showToast('Please fill in all fields', 'error');
+        return;
+    }
+
+    const role = { name, label, color };
+
+    if (editingRoleId) {
+        Storage.updateRole(editingRoleId, role);
+        showToast('Role updated', 'success');
+    } else {
+        Storage.addRole(role);
+        showToast('Role added', 'success');
+    }
+
+    closeModal('role-modal');
+    renderRoleList();
+    updateRoleDropdowns();
+}
+
+function deleteRole(id) {
+    showConfirm('Delete this role? Roles in use cannot be deleted.', () => {
+        const result = Storage.deleteRole(id);
+        if (result === true) {
+            renderRoleList();
+            updateRoleDropdowns();
+            showToast('Role deleted', 'success');
+        } else if (result.error) {
+            showToast(result.error, 'error');
+        }
+    });
+}
+
+function renderRoleList() {
+    const roles = Storage.getRoles();
+    const container = document.getElementById('role-list');
+
+    if (roles.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>No roles defined. Click "Add Role" to create one.</p></div>';
+        return;
+    }
+
+    container.innerHTML = roles.map(role => `
+        <div class="list-item">
+            <div class="list-item-header">
+                <span class="list-item-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="width: 20px; height: 20px; border-radius: 4px; background: ${role.color};"></span>
+                    ${role.label}
+                </span>
+                <span style="font-size: 0.875rem; color: var(--text-muted);">${role.name}</span>
+            </div>
+            <div class="list-item-actions">
+                <button class="btn btn-sm" onclick="openRoleModal(Storage.getRoles().find(r => r.id === ${role.id}))">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteRole(${role.id})">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateRoleDropdowns() {
+    const roles = Storage.getRoles();
+    const empRoleSelect = document.getElementById('emp-role');
+    const shiftRoleSelect = document.getElementById('shift-role');
+
+    const options = roles.map(r => `<option value="${r.name}">${r.label}</option>`).join('');
+
+    if (empRoleSelect) empRoleSelect.innerHTML = options;
+    if (shiftRoleSelect) shiftRoleSelect.innerHTML = options;
+}
+
+// =============================================================================
+// SETTINGS MANAGEMENT
+// =============================================================================
+
+function initSettingsForm() {
+    document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
+}
+
+function loadSettings() {
+    const settings = Storage.getSettings();
+    document.getElementById('setting-min-rest').value = settings.minRestHours || 10;
+    document.getElementById('setting-max-consecutive').value = settings.maxConsecutiveDays || 5;
+}
+
+function saveSettings() {
+    const minRestHours = parseInt(document.getElementById('setting-min-rest').value);
+    const maxConsecutiveDays = parseInt(document.getElementById('setting-max-consecutive').value);
+
+    Storage.updateSettings({ minRestHours, maxConsecutiveDays });
+    showToast('Settings saved', 'success');
 }
 
 // =============================================================================
@@ -328,6 +458,7 @@ function deleteEmployee(id) {
 
 function renderEmployeeList() {
     const employees = Storage.getEmployees();
+    const roles = Storage.getRoles();
     const container = document.getElementById('employee-list');
 
     if (employees.length === 0) {
@@ -336,6 +467,9 @@ function renderEmployeeList() {
     }
 
     container.innerHTML = employees.map(emp => {
+        const role = roles.find(r => r.name === emp.role);
+        const roleColor = role?.color || '#666';
+
         const availDays = CONFIG.days.map(d => {
             const avail = emp.availability[d];
             return `<div class="day-dot ${avail ? 'available' : ''}" title="${d}">${CONFIG.dayAbbrev[d]}</div>`;
@@ -345,7 +479,7 @@ function renderEmployeeList() {
             <div class="list-item">
                 <div class="list-item-header">
                     <span class="list-item-title">${emp.name}</span>
-                    <span class="role-badge ${emp.role.toLowerCase()}">${emp.role}</span>
+                    <span class="role-badge" style="background: ${roleColor}; color: white;">${emp.role}</span>
                 </div>
                 <div class="list-item-meta">
                     <span class="meta-item">🎯 ${emp.targetHours}h target</span>
@@ -454,6 +588,7 @@ function deleteShift(id) {
 
 function renderShiftList() {
     const shifts = Storage.getShifts();
+    const roles = Storage.getRoles();
     const container = document.getElementById('shift-list');
 
     if (shifts.length === 0) {
@@ -461,23 +596,27 @@ function renderShiftList() {
         return;
     }
 
-    container.innerHTML = shifts.map(shift => `
-        <div class="list-item">
-            <div class="list-item-header">
-                <span class="list-item-title">${shift.name}</span>
-                <span class="role-badge ${shift.role.toLowerCase()}">${shift.role}</span>
+    container.innerHTML = shifts.map(shift => {
+        const role = roles.find(r => r.name === shift.role);
+        const roleColor = role?.color || '#666';
+
+        return `
+            <div class="list-item">
+                <div class="list-item-header">
+                    <span class="list-item-title">${shift.name}</span>
+                    <span class="role-badge" style="background: ${roleColor}; color: white;">${shift.role}</span>
+                </div>
+                <div class="list-item-meta">
+                    <span class="meta-item">⏰ ${String(shift.start).padStart(2, '0')}:00 - ${String(shift.end).padStart(2, '0')}:00</span>
+                    <span class="meta-item">📊 ${shift.end - shift.start} hours</span>
+                </div>
+                <div class="list-item-actions">
+                    <button class="btn btn-sm" onclick="openShiftModal(Storage.getShifts().find(s => s.id === ${shift.id}))">Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteShift(${shift.id})">Delete</button>
+                </div>
             </div>
-            <div class="list-item-meta">
-                <span class="meta-item">⏰ ${String(shift.start).padStart(2, '0')}:00 - ${String(shift.end).padStart(2, '0')}:00</span>
-                <span class="meta-item">📊 ${shift.end - shift.start} hours</span>
-                <span class="meta-item">📅 ${shifts.length * 7} shifts/week</span>
-            </div>
-            <div class="list-item-actions">
-                <button class="btn btn-sm" onclick="openShiftModal(Storage.getShifts().find(s => s.id === ${shift.id}))">Edit</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteShift(${shift.id})">Delete</button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // =============================================================================
@@ -487,6 +626,7 @@ function renderShiftList() {
 function runScheduler() {
     const employees = Storage.getEmployees();
     const shifts = Storage.getShifts();
+    const settings = Storage.getSettings();
 
     if (employees.length === 0) {
         showToast('Add some employees first', 'error');
@@ -498,15 +638,15 @@ function runScheduler() {
         return;
     }
 
-    // Run the scheduler
-    const result = Scheduler.generateSchedule(employees, shifts);
+    // Run the scheduler with settings
+    const result = Scheduler.generateSchedule(employees, shifts, settings);
 
     if (result.success) {
         currentSchedule = result;
         Storage.saveSchedule(result);
         renderSchedule();
         updateStats();
-        showToast(`Schedule generated in ${result.solveTime}ms`, 'success');
+        showToast(`Schedule generated in ${result.solveTime}ms (rest: ${settings.minRestHours}h, max days: ${settings.maxConsecutiveDays})`, 'success');
     } else {
         showToast(result.message, 'error');
 
@@ -547,6 +687,7 @@ function renderSchedule() {
 function renderScheduleGrid() {
     const container = document.getElementById('schedule-grid');
     const schedule = currentSchedule.schedule;
+    const roles = Storage.getRoles();
 
     // Group by employee
     const byEmployee = {};
@@ -558,8 +699,8 @@ function renderScheduleGrid() {
     });
 
     const employees = Object.values(byEmployee).sort((a, b) => {
-        const order = { ATL: 0, FullTime: 1, PartTime: 2 };
-        return (order[a.role] || 99) - (order[b.role] || 99);
+        const roleOrder = Storage.getRoles().map(r => r.name);
+        return roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role);
     });
 
     let html = '<div class="grid-header employee-col">Employee</div>';
@@ -568,11 +709,14 @@ function renderScheduleGrid() {
     });
 
     employees.forEach(emp => {
+        const role = roles.find(r => r.name === emp.role);
+        const roleColor = role?.color || '#666';
+
         html += `<div class="grid-cell employee-cell">${emp.name}</div>`;
         CONFIG.days.forEach(day => {
             const s = emp.shifts[day];
             if (s) {
-                html += `<div class="grid-cell"><span class="shift-badge ${s.role.toLowerCase()}">${s.shift}</span></div>`;
+                html += `<div class="grid-cell"><span class="shift-badge" style="background: ${roleColor}20; color: ${roleColor}; border: 1px solid ${roleColor}40;">${s.shift}</span></div>`;
             } else {
                 html += `<div class="grid-cell"><span class="shift-empty">—</span></div>`;
             }
@@ -586,6 +730,7 @@ function renderScheduleGrid() {
 function renderScheduleList() {
     const container = document.getElementById('schedule-list');
     const schedule = currentSchedule.schedule;
+    const roles = Storage.getRoles();
 
     const byDay = {};
     CONFIG.days.forEach(d => byDay[d] = []);
@@ -599,15 +744,19 @@ function renderScheduleList() {
             <div class="day-section">
                 <div class="day-header"><span>${day}</span><span>${shifts.length} shifts</span></div>
                 <div class="day-shifts">
-                    ${shifts.map(s => `
-                        <div class="shift-item">
-                            <div class="shift-info">
-                                <span class="shift-time">${s.shift}</span>
-                                <span>${s.employee}</span>
+                    ${shifts.map(s => {
+            const role = roles.find(r => r.name === s.role);
+            const roleColor = role?.color || '#666';
+            return `
+                            <div class="shift-item">
+                                <div class="shift-info">
+                                    <span class="shift-time">${s.shift}</span>
+                                    <span>${s.employee}</span>
+                                </div>
+                                <span class="role-badge" style="background: ${roleColor}; color: white;">${s.role}</span>
                             </div>
-                            <span class="role-badge ${s.role.toLowerCase()}">${s.role}</span>
-                        </div>
-                    `).join('')}
+                        `;
+        }).join('')}
                 </div>
             </div>
         `;
@@ -619,10 +768,11 @@ function renderScheduleList() {
 function renderHoursSummary() {
     const container = document.getElementById('hours-summary');
     const employees = currentSchedule.employees;
+    const roles = Storage.getRoles();
 
     const sorted = [...employees].sort((a, b) => {
-        const order = { ATL: 0, FullTime: 1, PartTime: 2 };
-        return (order[a.role] || 99) - (order[b.role] || 99);
+        const roleOrder = roles.map(r => r.name);
+        return roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role);
     });
 
     container.innerHTML = sorted.map(emp => {
@@ -632,11 +782,14 @@ function renderHoursSummary() {
         if (diff > 0) { diffClass = 'positive'; diffText = `+${diff}`; }
         else if (diff < 0) { diffClass = 'negative'; diffText = `${diff}`; }
 
+        const role = roles.find(r => r.name === emp.role);
+        const roleColor = role?.color || '#666';
+
         return `
             <div class="employee-card">
                 <div class="employee-header">
                     <span class="employee-name">${emp.name}</span>
-                    <span class="role-badge ${emp.role.toLowerCase()}">${emp.role}</span>
+                    <span class="role-badge" style="background: ${roleColor}; color: white;">${emp.role}</span>
                 </div>
                 <div class="hours-bar"><div class="hours-fill" style="width:${pct}%"></div></div>
                 <div class="hours-info">
@@ -700,7 +853,10 @@ function initImportExport() {
                 Storage.importAll(data);
                 renderEmployeeList();
                 renderShiftList();
+                renderRoleList();
+                loadSettings();
                 updateStats();
+                updateRoleDropdowns();
                 showToast('Data imported successfully', 'success');
             } catch (err) {
                 showToast('Invalid file format', 'error');
@@ -719,11 +875,13 @@ function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    toast.innerHTML = `<span>${message}</span>`;
+
+    const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+    toast.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-message">${message}</span>`;
     container.appendChild(toast);
 
     setTimeout(() => {
-        toast.style.opacity = '0';
+        toast.classList.add('hiding');
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
