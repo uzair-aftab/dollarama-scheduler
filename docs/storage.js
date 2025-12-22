@@ -1,13 +1,29 @@
 /**
- * Storage Layer for Dollarama Shift Scheduler
- * Handles localStorage persistence, import/export, and default data
+ * Storage Layer for Dollarama Shift Scheduler v4.0
+ * Handles localStorage persistence, roles, scheduling constraints, and data operations
  */
 
 const Storage = {
     KEYS: {
         EMPLOYEES: 'scheduler_employees',
         SHIFTS: 'scheduler_shifts',
-        SCHEDULE: 'scheduler_last_schedule'
+        SCHEDULE: 'scheduler_last_schedule',
+        ROLES: 'scheduler_roles',
+        SETTINGS: 'scheduler_settings'
+    },
+
+    // Default roles
+    DEFAULT_ROLES: [
+        { id: 1, name: 'ATL', label: 'Manager', color: '#7c3aed', canManage: true },
+        { id: 2, name: 'FullTime', label: 'Full Time', color: '#003F24', canManage: false },
+        { id: 3, name: 'PartTime', label: 'Part Time', color: '#0891b2', canManage: false }
+    ],
+
+    // Default scheduling settings
+    DEFAULT_SETTINGS: {
+        minRestHours: 10,       // Minimum hours between shifts
+        maxConsecutiveDays: 5,  // Max days in a row an employee can work
+        weekStartsOn: 'Monday'
     },
 
     // Default shift template
@@ -164,9 +180,111 @@ const Storage = {
         if (!localStorage.getItem(this.KEYS.SHIFTS)) {
             this.saveShifts(this.DEFAULT_SHIFTS);
         }
+        if (!localStorage.getItem(this.KEYS.ROLES)) {
+            this.saveRoles(this.DEFAULT_ROLES);
+        }
+        if (!localStorage.getItem(this.KEYS.SETTINGS)) {
+            this.saveSettings(this.DEFAULT_SETTINGS);
+        }
     },
 
-    // Employee CRUD
+    // =========================================================================
+    // ROLES CRUD
+    // =========================================================================
+    getRoles() {
+        const data = localStorage.getItem(this.KEYS.ROLES);
+        return data ? JSON.parse(data) : this.DEFAULT_ROLES;
+    },
+
+    saveRoles(roles) {
+        localStorage.setItem(this.KEYS.ROLES, JSON.stringify(roles));
+    },
+
+    addRole(role) {
+        const roles = this.getRoles();
+        role.id = Math.max(0, ...roles.map(r => r.id)) + 1;
+        roles.push(role);
+        this.saveRoles(roles);
+        return role;
+    },
+
+    updateRole(id, updates) {
+        const roles = this.getRoles();
+        const idx = roles.findIndex(r => r.id === id);
+        if (idx !== -1) {
+            const oldName = roles[idx].name;
+            roles[idx] = { ...roles[idx], ...updates };
+            this.saveRoles(roles);
+
+            // Update employees and shifts if role name changed
+            if (updates.name && updates.name !== oldName) {
+                this._updateRoleReferences(oldName, updates.name);
+            }
+        }
+        return roles[idx];
+    },
+
+    deleteRole(id) {
+        const roles = this.getRoles();
+        const roleToDelete = roles.find(r => r.id === id);
+        if (!roleToDelete) return false;
+
+        // Check if role is in use
+        const employees = this.getEmployees();
+        const shifts = this.getShifts();
+        const inUse = employees.some(e => e.role === roleToDelete.name) ||
+            shifts.some(s => s.role === roleToDelete.name);
+
+        if (inUse) {
+            return { error: 'Role is in use by employees or shifts' };
+        }
+
+        this.saveRoles(roles.filter(r => r.id !== id));
+        return true;
+    },
+
+    _updateRoleReferences(oldName, newName) {
+        // Update employees
+        const employees = this.getEmployees();
+        employees.forEach(e => {
+            if (e.role === oldName) e.role = newName;
+        });
+        this.saveEmployees(employees);
+
+        // Update shifts
+        const shifts = this.getShifts();
+        shifts.forEach(s => {
+            if (s.role === oldName) s.role = newName;
+        });
+        this.saveShifts(shifts);
+    },
+
+    getRoleByName(name) {
+        return this.getRoles().find(r => r.name === name);
+    },
+
+    // =========================================================================
+    // SETTINGS
+    // =========================================================================
+    getSettings() {
+        const data = localStorage.getItem(this.KEYS.SETTINGS);
+        return data ? JSON.parse(data) : this.DEFAULT_SETTINGS;
+    },
+
+    saveSettings(settings) {
+        localStorage.setItem(this.KEYS.SETTINGS, JSON.stringify(settings));
+    },
+
+    updateSettings(updates) {
+        const settings = this.getSettings();
+        Object.assign(settings, updates);
+        this.saveSettings(settings);
+        return settings;
+    },
+
+    // =========================================================================
+    // EMPLOYEE CRUD
+    // =========================================================================
     getEmployees() {
         const data = localStorage.getItem(this.KEYS.EMPLOYEES);
         return data ? JSON.parse(data) : this.DEFAULT_EMPLOYEES;
@@ -199,7 +317,9 @@ const Storage = {
         this.saveEmployees(employees);
     },
 
-    // Shift CRUD
+    // =========================================================================
+    // SHIFT CRUD
+    // =========================================================================
     getShifts() {
         const data = localStorage.getItem(this.KEYS.SHIFTS);
         return data ? JSON.parse(data) : this.DEFAULT_SHIFTS;
@@ -232,7 +352,9 @@ const Storage = {
         this.saveShifts(shifts);
     },
 
-    // Schedule
+    // =========================================================================
+    // SCHEDULE
+    // =========================================================================
     getLastSchedule() {
         const data = localStorage.getItem(this.KEYS.SCHEDULE);
         return data ? JSON.parse(data) : null;
@@ -242,13 +364,17 @@ const Storage = {
         localStorage.setItem(this.KEYS.SCHEDULE, JSON.stringify(schedule));
     },
 
-    // Import/Export
+    // =========================================================================
+    // IMPORT/EXPORT
+    // =========================================================================
     exportAll() {
         return {
-            version: '2.0',
+            version: '4.0',
             exported: new Date().toISOString(),
             employees: this.getEmployees(),
             shifts: this.getShifts(),
+            roles: this.getRoles(),
+            settings: this.getSettings(),
             schedule: this.getLastSchedule()
         };
     },
@@ -256,14 +382,16 @@ const Storage = {
     importAll(data) {
         if (data.employees) this.saveEmployees(data.employees);
         if (data.shifts) this.saveShifts(data.shifts);
+        if (data.roles) this.saveRoles(data.roles);
+        if (data.settings) this.saveSettings(data.settings);
         if (data.schedule) this.saveSchedule(data.schedule);
     },
 
-    // Reset to defaults
+    // =========================================================================
+    // RESET
+    // =========================================================================
     resetToDefaults() {
-        localStorage.removeItem(this.KEYS.EMPLOYEES);
-        localStorage.removeItem(this.KEYS.SHIFTS);
-        localStorage.removeItem(this.KEYS.SCHEDULE);
+        Object.values(this.KEYS).forEach(key => localStorage.removeItem(key));
         this.init();
     }
 };

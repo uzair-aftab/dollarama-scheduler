@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dollarama Shift Scheduler</title>
+    <title>Shift Scheduler - Inspired by Dollarama</title>
     <meta name="description" content="Interactive shift scheduling tool with constraint-based optimization">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,11 +48,11 @@
                     </div>
                 </div>
             </div>
-            <!-- Tab Navigation -->
             <nav class="tab-nav">
                 <button class="tab-btn active" data-tab="schedule">📋 Schedule</button>
                 <button class="tab-btn" data-tab="employees">👥 Employees</button>
                 <button class="tab-btn" data-tab="shifts">⏰ Shifts</button>
+                <button class="tab-btn" data-tab="settings">⚙️ Settings</button>
             </nav>
         </header>
 
@@ -138,11 +138,52 @@
                     </div>
                 </div>
             </section>
+
+            <!-- SETTINGS TAB -->
+            <section class="tab-content" id="tab-settings">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>⚙️ Scheduling Settings</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="settings-section">
+                            <h3 class="settings-title">📊 Scheduling Constraints</h3>
+                            <div class="settings-row">
+                                <span class="settings-label">Minimum rest hours between shifts</span>
+                                <div class="settings-value">
+                                    <input type="number" id="setting-min-rest" min="0" max="24" value="10">
+                                    <span>hours</span>
+                                </div>
+                            </div>
+                            <div class="settings-row">
+                                <span class="settings-label">Maximum consecutive working days</span>
+                                <div class="settings-value">
+                                    <input type="number" id="setting-max-consecutive" min="1" max="7" value="5">
+                                    <span>days</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" id="save-settings-btn" style="margin-top: 1rem;">💾 Save
+                                Settings</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🎨 Role Management</h2>
+                        <button class="btn btn-primary" id="add-role-btn">+ Add Role</button>
+                    </div>
+                    <div class="card-body">
+                        <p class="hint">Customize roles for your team. Default roles cannot be deleted if in use.</p>
+                        <div id="role-list" class="shift-list"></div>
+                    </div>
+                </div>
+            </section>
         </main>
 
         <!-- Footer -->
         <footer class="footer">
-            <p>Shift Scheduler v3.0 • Built with JavaScript</p>
+            <p>Shift Scheduler v4.0 • Built with JavaScript</p>
             <p class="footer-link">
                 <a href="https://github.com/uzair-aftab/dollarama-scheduler" target="_blank">View on GitHub</a>
             </p>
@@ -262,6 +303,41 @@
             <div class="modal-footer">
                 <button class="btn" id="confirm-cancel">Cancel</button>
                 <button class="btn btn-danger" id="confirm-ok">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Role Form -->
+    <div class="modal-overlay" id="role-modal">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h3 id="role-modal-title">Add Role</h3>
+                <button class="btn btn-icon modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="role-form">
+                    <input type="hidden" id="role-id">
+
+                    <div class="form-group">
+                        <label for="role-name">Role Name (ID)</label>
+                        <input type="text" id="role-name" required placeholder="e.g., Cashier">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role-label">Display Label</label>
+                        <input type="text" id="role-label" required placeholder="e.g., Cashier">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role-color">Color</label>
+                        <input type="color" id="role-color" value="#003F24"
+                            style="width: 100%; height: 50px; border-radius: 8px; border: 2px solid var(--border-color);">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="cancel-role-btn">Cancel</button>
+                <button class="btn btn-primary" id="save-role-btn">Save Role</button>
             </div>
         </div>
     </div>
