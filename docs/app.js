@@ -286,10 +286,35 @@ function initModals() {
     document.getElementById('add-employee-btn').addEventListener('click', () => openEmployeeModal());
     document.getElementById('add-shift-btn').addEventListener('click', () => openShiftModal());
     document.getElementById('add-role-btn').addEventListener('click', () => openRoleModal());
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        // Escape closes modals
+        if (e.key === 'Escape') {
+            closeAllModals();
+        }
+    });
+
+    // Form submission with Enter
+    document.querySelectorAll('.modal form').forEach(form => {
+        form.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                const submitBtn = form.closest('.modal').querySelector('.modal-footer .btn-primary');
+                if (submitBtn) submitBtn.click();
+            }
+        });
+    });
 }
 
 function openModal(id) {
-    document.getElementById(id).classList.add('show');
+    const modal = document.getElementById(id);
+    modal.classList.add('show');
+    // Focus the first input
+    setTimeout(() => {
+        const firstInput = modal.querySelector('input:not([type="hidden"]), select');
+        if (firstInput) firstInput.focus();
+    }, 100);
 }
 
 function closeModal(id) {
@@ -832,6 +857,7 @@ function renderShiftList() {
 // =============================================================================
 
 function runScheduler() {
+    const btn = document.getElementById('run-scheduler-btn');
     const employees = Storage.getEmployees();
     const shifts = Storage.getShifts();
     const settings = Storage.getSettings();
@@ -846,22 +872,38 @@ function runScheduler() {
         return;
     }
 
-    // Run the scheduler with settings
-    const result = Scheduler.generateSchedule(employees, shifts, settings);
+    // Show loading state
+    btn.classList.add('loading');
+    btn.disabled = true;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span>⏳</span> Generating...';
 
-    if (result.success) {
-        currentSchedule = result;
-        Storage.saveSchedule(result);
-        renderSchedule();
-        updateStats();
-        showToast(`Schedule generated in ${result.solveTime}ms (rest: ${settings.minRestHours}h, max days: ${settings.maxConsecutiveDays})`, 'success');
-    } else {
-        showToast(result.message, 'error');
+    // Run async to allow UI update
+    setTimeout(() => {
+        try {
+            // Run the scheduler with settings
+            const result = Scheduler.generateSchedule(employees, shifts, settings);
 
-        if (result.unfillable) {
-            console.log('Unfillable shifts:', result.unfillable);
+            if (result.success) {
+                currentSchedule = result;
+                Storage.saveSchedule(result);
+                renderSchedule();
+                updateStats();
+                showToast(`Schedule generated in ${result.solveTime}ms (rest: ${settings.minRestHours}h, max days: ${settings.maxConsecutiveDays})`, 'success');
+            } else {
+                showToast(result.message, 'error');
+
+                if (result.unfillable) {
+                    console.log('Unfillable shifts:', result.unfillable);
+                }
+            }
+        } finally {
+            // Remove loading state
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
         }
-    }
+    }, 50);
 }
 
 // =============================================================================

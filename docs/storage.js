@@ -40,7 +40,9 @@ const Storage = {
         { id: 3, name: 'Day-FT', start: 10, end: 18, role: 'FullTime' },
         { id: 4, name: 'Afternoon-PT', start: 13, end: 18, role: 'PartTime' },
         { id: 5, name: 'Closer-ATL', start: 14, end: 21, role: 'ATL' },
-        { id: 6, name: 'Closer-PT', start: 17, end: 21, role: 'PartTime' }
+        { id: 6, name: 'Closer-PT', start: 17, end: 21, role: 'PartTime' },
+        { id: 7, name: 'Morning-TL', start: 8, end: 16, role: 'TL' },
+        { id: 8, name: 'Closer-TL', start: 12, end: 20, role: 'TL' }
     ],
 
     // Default employees
@@ -134,6 +136,7 @@ const Storage = {
             name: 'Uzair Aftab',
             role: 'PartTime',
             employmentStatus: 'InternationalStudent',
+            onScheduledBreak: false,
             maxHours: 24,
             targetHours: 20,
             availability: {
@@ -170,6 +173,7 @@ const Storage = {
             name: 'Priya Sharma',
             role: 'PartTime',
             employmentStatus: 'InternationalStudent',
+            onScheduledBreak: false,
             maxHours: 24,
             targetHours: 18,
             availability: {
@@ -388,7 +392,7 @@ const Storage = {
     // =========================================================================
     exportAll() {
         return {
-            version: '4.0',
+            version: '5.1',
             exported: new Date().toISOString(),
             employees: this.getEmployees(),
             shifts: this.getShifts(),
